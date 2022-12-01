@@ -23,12 +23,3 @@ fun <T, U> Iterable<T>.splitBy(predicate: (T) -> Boolean, mapElement: (T) -> U):
         else acc.last() += mapElement(s)
         acc
     }
-
-fun <T> Sequence<T>.splitBy(predicate: (T) -> Boolean): List<List<T>> = splitBy(predicate) { it }
-
-fun <T, U> Sequence<T>.splitBy(predicate: (T) -> Boolean, mapElement: (T) -> U): List<List<U>> =
-    fold(mutableListOf(mutableListOf<U>())) { acc, s ->
-        if (predicate(s)) acc += mutableListOf<U>()
-        else acc.last() += mapElement(s)
-        acc
-    }

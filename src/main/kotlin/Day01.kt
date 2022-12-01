@@ -2,12 +2,10 @@ class Day01(filename: String = "Day01") {
     private val input: List<String> = readInput(filename)
 
     fun part1(): Int = input
-        .asSequence()
         .splitBy(predicate = { it == "" }, mapElement = { it.toInt() })
         .maxOf { it.sum() }
 
     fun part2(): Int = input
-        .asSequence()
         .splitBy(predicate = { it == "" }, mapElement = { it.toInt() })
         .map { it.sum() }
         .sorted()
