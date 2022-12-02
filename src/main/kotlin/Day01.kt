@@ -1,4 +1,4 @@
-class Day01(filename: String = "Day01") {
+class Day01(filename: String) {
     private val input: List<String> = readInput(filename)
 
     fun part1(): Int = input
