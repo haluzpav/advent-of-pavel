@@ -6,7 +6,7 @@ class Day03(filename: String) {
         for (s in input) {
             check(s.length.rem(2) == 0)
             val (comp1, comp2) = s.chunked(s.length / 2) { it.toSet() }
-            val inBoth = comp1.toSet().intersect(comp2).single()
+            val inBoth = comp1.intersect(comp2).single()
             sum += inBoth.priority
         }
         return sum
