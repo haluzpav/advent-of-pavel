@@ -4,9 +4,9 @@ class Day03(filename: String) {
     fun part1(): Int {
         var sum = 0
         for (s in input) {
-            val comp1String = s.substring(0 until s.length / 2)
-            val comp2String = s.substring(s.length / 2 until s.length)
-            val inBoth = comp1String.toSet().intersect(comp2String.toSet()).single()
+            check(s.length.rem(2) == 0)
+            val (comp1, comp2) = s.chunked(s.length / 2) { it.toSet() }
+            val inBoth = comp1.toSet().intersect(comp2).single()
             sum += inBoth.priority
         }
         return sum
@@ -15,8 +15,7 @@ class Day03(filename: String) {
     fun part2(): Int {
         check(input.size.rem(3) == 0)
         var sum = 0
-        for (i in 0 until input.size / 3) {
-            val group = input.subList(i * 3, i * 3 + 3)
+        input.chunked(3) { group ->
             val inAll = group.map { it.toSet() }.reduce { acc, chars -> acc.intersect(chars) }.single()
             sum += inAll.priority
         }
