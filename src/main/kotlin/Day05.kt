@@ -1,8 +1,6 @@
 class Day05(filename: String) {
     private val input: List<String> = readInput(filename)
 
-    private val moveRegex = Regex(""".*?(\d+).*?(\d+).*?(\d+)""")
-
     fun part1(): String {
         val stacks = parseStacks()
         input.dropWhile { !it.startsWith("move") }
@@ -44,8 +42,7 @@ class Day05(filename: String) {
 
     private fun parseMoveLine(line: String): Triple<Int, Int, Int> {
         check(line.startsWith("move"))
-        val (count, from, to) = moveRegex.matchEntire(line)!!.groupValues
-            .drop(1).map { it.toInt() }
+        val (count, from, to) = line.split(' ').slice(listOf(1, 3, 5)).map { it.toInt() }
         return Triple(count, from - 1, to - 1)
     }
 
