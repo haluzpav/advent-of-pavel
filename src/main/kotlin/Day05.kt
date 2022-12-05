@@ -27,14 +27,13 @@ class Day05(filename: String) {
     }
 
     private fun parseStacks(): List<ArrayDeque<Char>> {
-        val stacks = mutableListOf<ArrayDeque<Char>>()
-        for (s in input) {
-            val chunked = s.chunked(4) { it[1].takeUnless { it == ' ' } }
-            if (chunked[0] == '1') break
-            chunked
+        val height = input.indexOfFirst { it.startsWith(" 1") }
+        val count = input[height].split(' ').last().toInt()
+        val stacks = List(count) { ArrayDeque<Char>(height) }
+        input.take(height).forEach { s ->
+            s.chunked(4) { it[1].takeUnless { it == ' ' } }
                 .forEachIndexed { index, c ->
-                    val stack = stacks.getOrNull(index) ?: ArrayDeque<Char>().also { stacks += it }
-                    if (c != null) stack.addFirst(c)
+                    if (c != null) stacks[index].addFirst(c)
                 }
         }
         return stacks
