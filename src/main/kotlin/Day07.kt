@@ -72,9 +72,11 @@ class Day07(filename: String) {
             .flatMap { findAtMost100kDirs(it) }
 
     private fun findAtLeastDirs(graph: Node.Directory, minSize: Long): List<Node.Directory> =
-        listOfNotNull(graph.takeIf { it.childrenSize!! >= minSize }) + graph.children
-            .filterIsInstance<Node.Directory>()
-            .flatMap { findAtLeastDirs(it, minSize) }
+        graph.takeIf { it.childrenSize!! >= minSize }?.let { bigEnoughGraph ->
+            listOf(bigEnoughGraph) + bigEnoughGraph.children
+                .filterIsInstance<Node.Directory>()
+                .flatMap { findAtLeastDirs(it, minSize) }
+        } ?: emptyList()
 }
 
 private sealed interface Node {
