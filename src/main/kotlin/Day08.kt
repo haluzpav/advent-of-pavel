@@ -4,47 +4,31 @@ class Day08(filename: String) {
     private val dirSize = Direction.values().size
 
     fun part1(): Int {
-        return Direction.values().map { direction ->
-            val indices = indicesToLookAt(direction)
-            indices.flatMap {
-                buildList {
-                    var m = Char.MIN_VALUE
-                    for (pair in it) {
-                        val (x, y) = pair
-                        val h = input[x][y]
-                        if (h > m) {
-                            this += pair
-                            m = h
-                        }
+        val visiblePoses = mutableSetOf<Pos>()
+        for (direction in Direction.values()) {
+            val sideStepDirection = Direction.values()[(direction.ordinal - 1 + dirSize).rem(dirSize)]
+            var rowStart: Pos? = when (direction) {
+                Direction.N -> treesInRow to treesInRow
+                Direction.E -> treesInRow to 0
+                Direction.S -> 0 to 0
+                Direction.W -> 0 to treesInRow
+            }
+            while (rowStart != null) {
+                var pos: Pos? = rowStart
+                var m = Char.MIN_VALUE
+                while (pos != null) {
+                    val (x, y) = pos
+                    val h = input[x][y]
+                    if (h > m) {
+                        visiblePoses += pos
+                        m = h
                     }
+                    pos = nextInDirection(direction, pos)
                 }
-            }.toSet()
-        }.reduce { acc, set -> acc + set }.count()
-    }
-
-    // TODO don't generate this shit when it's used just once ffs -> inline
-    private fun indicesToLookAt(direction: Direction): List<List<Pos>> {
-        val nextDirection = Direction.values()[(direction.ordinal - 1 + dirSize).rem(dirSize)]
-        val start: Pos = when (direction) {
-            Direction.N -> treesInRow to treesInRow
-            Direction.E -> treesInRow to 0
-            Direction.S -> 0 to 0
-            Direction.W -> 0 to treesInRow
-        }
-        var s: Pos? = start
-        val toLookAt: List<List<Pos>> = buildList {
-            while (s != null) {
-                this += buildList<Pos> {
-                    var c: Pos? = s
-                    while (c != null) {
-                        this += c
-                        c = nextInDirection(direction, c)
-                    }
-                }
-                s = nextInDirection(nextDirection, s!!)
+                rowStart = nextInDirection(sideStepDirection, rowStart)
             }
         }
-        return toLookAt
+        return visiblePoses.count()
     }
 
     fun part2(): Int {
@@ -80,10 +64,10 @@ class Day08(filename: String) {
             Direction.W -> (y - 1).takeUnless { it < 0 }?.let { x to it }
         }
     }
-}
 
-private enum class Direction {
-    N, E, S, W
+    private enum class Direction {
+        N, E, S, W
+    }
 }
 
 typealias Pos = Pair<Int, Int>
