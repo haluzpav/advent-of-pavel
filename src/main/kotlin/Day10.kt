@@ -15,14 +15,9 @@ class Day10(inputName: String) {
         .runningFold(1) { acc, i -> i?.let { acc + it } ?: acc }
 
     fun part1(): Int = xReg
-        .mapIndexedNotNull { index, i ->
-            if ((index + 1 - 20).rem(40) == 0) {
-                i * (index + 1)
-            } else {
-                null
-            }
-        }
-        .sum()
+        .mapIndexed { index, i -> index to i }
+        .filter { (index, _) -> (index + 1 - 20).rem(40) == 0 }
+        .sumOf { (index, i) -> i * (index + 1) }
 
     fun part2(): String = xReg
         .mapIndexed { index, spritePos ->
