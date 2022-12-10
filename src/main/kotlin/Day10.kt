@@ -27,7 +27,7 @@ class Day10(inputName: String) {
     fun part2(): String = xReg
         .mapIndexed { index, spritePos ->
             val cyclePos = index.rem(40)
-            if (abs(cyclePos - spritePos) <= 1) '#' else '.'
+            if (abs(cyclePos - spritePos) <= 1) '█' else ' '
         }
         .joinToString(separator = "")
         .chunked(40)
