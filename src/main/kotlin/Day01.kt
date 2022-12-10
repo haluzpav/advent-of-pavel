@@ -1,5 +1,5 @@
-class Day01(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day01(inputName: String) {
+    private val input: List<String> = loadInput(inputName)
 
     fun part1(): Int = input
         .splitBy(predicate = { it == "" }, mapElement = { it.toInt() })

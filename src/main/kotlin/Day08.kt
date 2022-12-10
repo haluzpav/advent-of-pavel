@@ -1,5 +1,5 @@
-class Day08(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day08(inputName: String) {
+    private val input: List<String> = loadInput(inputName)
     private val treesInRow: Int = input.lastIndex
     private val dirSize = Direction.values().size
 
@@ -17,8 +17,7 @@ class Day08(filename: String) {
                 var pos: Pos? = rowStart
                 var m = Char.MIN_VALUE
                 while (pos != null) {
-                    val (x, y) = pos
-                    val h = input[x][y]
+                    val h = input[pos]
                     if (h > m) {
                         visiblePoses += pos
                         m = h
@@ -36,13 +35,12 @@ class Day08(filename: String) {
         for (bx in 0..treesInRow) {
             for (by in 0..treesInRow) {
                 val b = bx to by
-                val bh = input[bx][by]
+                val bh = input[b]
                 val bv = Direction.values().map { direction ->
                     var c: Pos? = nextInDirection(direction, b)
                     var count = 0
                     while (c != null) {
-                        val (x, y) = c
-                        val ch = input[x][y]
+                        val ch = input[c]
                         count++
                         if (ch >= bh) break
                         c = nextInDirection(direction, c)
@@ -69,8 +67,6 @@ class Day08(filename: String) {
         N, E, S, W
     }
 }
-
-typealias Pos = Pair<Int, Int>
 
 fun main() {
     val task = Day08("Day08")

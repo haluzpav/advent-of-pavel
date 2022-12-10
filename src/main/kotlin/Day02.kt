@@ -1,5 +1,5 @@
-class Day02(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day02(inputName: String) {
+    private val input: List<String> = loadInput(inputName)
 
     fun part1(): Int = input.sumOf { calcScore1(it[0], it[2]) }
 

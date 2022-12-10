@@ -2,8 +2,8 @@ import java.lang.Integer.max
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-class Day09(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day09(inputName: String) {
+    private val input: Sequence<String> = readInput(inputName)
 
     fun part1(): Int = countTailPositions(ropeLength = 2)
 
@@ -42,10 +42,8 @@ class Day09(filename: String) {
     }
 
     private fun moveTail(head: Pos, tail: Pos): Pos {
-        val (hx, hy) = head
         val (tx, ty) = tail
-        val dx = hx - tx
-        val dy = hy - ty
+        val (dx, dy) = head - tail
         return when {
             max(dx.absoluteValue, dy.absoluteValue) <= 1 -> tail
             dx != 0 && dy != 0 -> tx + dx.sign to ty + dy.sign

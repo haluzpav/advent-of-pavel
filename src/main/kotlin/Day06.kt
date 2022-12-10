@@ -1,5 +1,5 @@
-class Day06(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day06(inputName: String) {
+    private val input: List<String> = loadInput(inputName)
 
     fun part1(): List<Int> = findRepetitions(4)
 

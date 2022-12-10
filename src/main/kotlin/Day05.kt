@@ -1,5 +1,5 @@
-class Day05(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day05(inputName: String) {
+    private val input: List<String> = loadInput(inputName)
 
     fun part1(): String {
         val stacks = parseStacks()

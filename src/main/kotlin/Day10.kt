@@ -1,10 +1,9 @@
 import kotlin.math.abs
 
-class Day10(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day10(inputName: String) {
+    private val input: Sequence<String> = readInput(inputName)
 
     private val xReg: Sequence<Int> = input
-        .asSequence()
         .flatMap {
             val parts = it.split(" ")
             when (val op = parts[0]) {

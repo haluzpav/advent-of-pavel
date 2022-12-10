@@ -1,5 +1,5 @@
-class Day04(filename: String) {
-    private val input: List<String> = readInput(filename)
+class Day04(inputName: String) {
+    private val input: List<String> = loadInput(inputName)
 
     fun part1(): Int = input
         .map(::parseRanges)
