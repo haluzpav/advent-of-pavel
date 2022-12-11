@@ -36,7 +36,7 @@ class Day11(inputName: String) {
         .toList()
 
     private fun simulate(monkeys: List<Monkey>, rounds: Int, boredom: (Long) -> Long): Long {
-        val inspectsCount = (0..monkeys.lastIndex).associateWith { 0 }.toMutableMap()
+        val inspectsCount = monkeys.associate { it.id to 0 }.toMutableMap()
         for (round in 1..rounds) {
             for (monkey in monkeys) {
                 for (item in monkey.items) {
