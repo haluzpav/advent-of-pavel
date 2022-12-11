@@ -9,7 +9,7 @@ class Day11(inputName: String) {
                 for (item in monkey.items) {
                     val increasedWorry = monkey.operation(item)
                     val boredWorry = increasedWorry / 3
-                    val target = if (boredWorry.rem(monkey.testDivisor) == 0) {
+                    val target = if (boredWorry.rem(monkey.testDivisor) == 0L) {
                         monkey.testSuccessTarget
                     } else {
                         monkey.testFailTarget
@@ -29,18 +29,19 @@ class Day11(inputName: String) {
     fun part2(): Long {
         val monkeys = parseMonkey()
         val inspectsCount = (0..monkeys.lastIndex).associateWith { 0 }.toMutableMap()
+        val mod = monkeys.map { it.testDivisor }.reduce { acc, i -> acc * i }
         for (round in 1..10_000) {
             for (monkey in monkeys) {
                 for (item in monkey.items) {
                     if (item < 0) error("round $round, item $item")
                     val increasedWorry = monkey.operation(item)
-                    // val boredWorry = increasedWorry / 3
-                    val target = if (increasedWorry.rem(monkey.testDivisor) == 0) {
+                    val boredWorry = increasedWorry.rem(mod)
+                    val target = if (boredWorry.rem(monkey.testDivisor) == 0L) {
                         monkey.testSuccessTarget
                     } else {
                         monkey.testFailTarget
                     }
-                    monkeys[target].items += increasedWorry
+                    monkeys[target].items += boredWorry
                 }
                 inspectsCount[monkey.id] = inspectsCount[monkey.id]!! + monkey.items.size
                 monkey.items.clear()
@@ -60,28 +61,28 @@ class Day11(inputName: String) {
                 id = monkey[7].digitToInt(),
                 operation = run {
                     val parts = operation.split(' ')
-                    val number = parts[5].toIntOrNull()
+                    val number = parts[5].toLongOrNull()
                     when (val op = parts[4].single()) {
-                        '+' -> { old: Int -> old + (number ?: old) }
-                        '*' -> { old: Int -> old * (number ?: old) }
+                        '+' -> { old: Long -> old + (number ?: old) }
+                        '*' -> { old: Long -> old * (number ?: old) }
                         else -> error("Unknown operator $op")
                     }
                 },
                 testDivisor = test.split(' ')[3].toInt(),
                 testSuccessTarget = testSuccess.split(' ')[5].toInt(),
                 testFailTarget = testFail.split(' ')[5].toInt(),
-                items = items.drop(16).split(", ").map { it.toInt() }.toMutableList(),
+                items = items.drop(16).split(", ").map { it.toLong() }.toMutableList(),
             )
         }
         .toList()
 
     data class Monkey(
         val id: Int,
-        val operation: (Int) -> Int,
+        val operation: (Long) -> Long,
         val testDivisor: Int,
         val testSuccessTarget: Int,
         val testFailTarget: Int,
-        val items: MutableList<Int>,
+        val items: MutableList<Long>,
     )
 }
 
