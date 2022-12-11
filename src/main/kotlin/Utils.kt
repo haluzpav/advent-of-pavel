@@ -23,3 +23,5 @@ operator fun List<String>.get(pos: Pos): Char = this[pos.first][pos.second]
 operator fun Pos.plus(other: Pos): Pos = first + other.first to second + other.second
 
 operator fun Pos.minus(other: Pos): Pos = first - other.first to second - other.second
+
+operator fun <E> List<E>.component6(): E = this[5]
