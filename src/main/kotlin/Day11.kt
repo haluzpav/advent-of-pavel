@@ -1,59 +1,18 @@
 class Day11(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 
-    fun part1(): Int {
-        val monkeys = parseMonkey()
-        val inspectsCount = (0..monkeys.lastIndex).associateWith { 0 }.toMutableMap()
-        for (round in 1..20) {
-            for (monkey in monkeys) {
-                for (item in monkey.items) {
-                    val increasedWorry = monkey.operation(item)
-                    val boredWorry = increasedWorry / 3
-                    val target = if (boredWorry.rem(monkey.testDivisor) == 0L) {
-                        monkey.testSuccessTarget
-                    } else {
-                        monkey.testFailTarget
-                    }
-                    monkeys[target].items += boredWorry
-                }
-                inspectsCount[monkey.id] = inspectsCount[monkey.id]!! + monkey.items.size
-                monkey.items.clear()
-            }
-        }
-        return inspectsCount.values
-            .sortedDescending()
-            .take(2)
-            .reduce { acc, i -> acc * i }
+    fun part1(): Long {
+        val monkeys = parseMonkeys()
+        return simulate(monkeys, rounds = 20) { it / 3 }
     }
 
     fun part2(): Long {
-        val monkeys = parseMonkey()
-        val inspectsCount = (0..monkeys.lastIndex).associateWith { 0 }.toMutableMap()
+        val monkeys = parseMonkeys()
         val mod = monkeys.map { it.testDivisor }.reduce { acc, i -> acc * i }
-        for (round in 1..10_000) {
-            for (monkey in monkeys) {
-                for (item in monkey.items) {
-                    if (item < 0) error("round $round, item $item")
-                    val increasedWorry = monkey.operation(item)
-                    val boredWorry = increasedWorry.rem(mod)
-                    val target = if (boredWorry.rem(monkey.testDivisor) == 0L) {
-                        monkey.testSuccessTarget
-                    } else {
-                        monkey.testFailTarget
-                    }
-                    monkeys[target].items += boredWorry
-                }
-                inspectsCount[monkey.id] = inspectsCount[monkey.id]!! + monkey.items.size
-                monkey.items.clear()
-            }
-        }
-        return inspectsCount.values
-            .sortedDescending()
-            .take(2)
-            .fold(1L) { acc, i -> acc * i }
+        return simulate(monkeys, rounds = 10_000) { it.rem(mod) }
     }
 
-    private fun parseMonkey() = input
+    private fun parseMonkeys() = input
         .map { it.trim() }
         .chunked(7)
         .map { (monkey, items, operation, test, testSuccess, testFail) ->
@@ -75,6 +34,30 @@ class Day11(inputName: String) {
             )
         }
         .toList()
+
+    private fun simulate(monkeys: List<Monkey>, rounds: Int, boredom: (Long) -> Long): Long {
+        val inspectsCount = (0..monkeys.lastIndex).associateWith { 0 }.toMutableMap()
+        for (round in 1..rounds) {
+            for (monkey in monkeys) {
+                for (item in monkey.items) {
+                    val increasedWorry = monkey.operation(item)
+                    val boredWorry = boredom(increasedWorry)
+                    val target = if (boredWorry.rem(monkey.testDivisor) == 0L) {
+                        monkey.testSuccessTarget
+                    } else {
+                        monkey.testFailTarget
+                    }
+                    monkeys[target].items += boredWorry
+                }
+                inspectsCount[monkey.id] = inspectsCount[monkey.id]!! + monkey.items.size
+                monkey.items.clear()
+            }
+        }
+        return inspectsCount.values
+            .sortedDescending()
+            .take(2)
+            .fold(1L) { acc, i -> acc * i }
+    }
 
     data class Monkey(
         val id: Int,
