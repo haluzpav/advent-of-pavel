@@ -12,7 +12,7 @@ class Day11(inputName: String) {
         return simulate(monkeys, rounds = 10_000) { it.rem(mod) }
     }
 
-    private fun parseMonkeys() = input
+    private fun parseMonkeys(): List<Monkey> = input
         .map { it.trim() }
         .chunked(7)
         .map { (monkey, items, operation, test, testSuccess, testFail) ->
