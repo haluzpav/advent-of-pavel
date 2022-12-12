@@ -77,19 +77,19 @@ class Day07(inputName: String) {
                 .filterIsInstance<Node.Directory>()
                 .flatMap { findAtLeastDirs(it, minSize) }
         } ?: emptyList()
-}
 
-private sealed interface Node {
-    data class Directory(
-        val name: String,
-        val children: MutableList<Node> = mutableListOf(),
-        var childrenSize: Long? = null,
-    ) : Node
+    private sealed interface Node {
+        data class Directory(
+            val name: String,
+            val children: MutableList<Node> = mutableListOf(),
+            var childrenSize: Long? = null,
+        ) : Node
 
-    data class File(
-        val name: String,
-        val size: Long,
-    ) : Node
+        data class File(
+            val name: String,
+            val size: Long,
+        ) : Node
+    }
 }
 
 fun main() {
