@@ -26,14 +26,8 @@ class Day15(inputName: String) {
                     val dJustOutOfRange = sensor.distance + 1
                     for (i in 0 until dJustOutOfRange) {
                         yield(x + i to y - dJustOutOfRange + i)
-                    }
-                    for (i in 0 until dJustOutOfRange) {
                         yield(x + dJustOutOfRange - i to y + i)
-                    }
-                    for (i in 0 until dJustOutOfRange) {
                         yield(x - i to y + dJustOutOfRange - i)
-                    }
-                    for (i in 0 until dJustOutOfRange) {
                         yield(x - dJustOutOfRange + i to y - i)
                     }
                 }
