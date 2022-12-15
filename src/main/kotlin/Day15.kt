@@ -3,27 +3,39 @@ import kotlin.math.abs
 class Day15(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 
-    fun part1(row: Int): Int {
-        val r = Regex("""^.*x=(-?[0-9]+), y=(-?[0-9]+).+x=(-?[0-9]+), y=(-?[0-9]+).*$""")
-        val sensors = input.map { line ->
-            val (sensorX, sensorY, beaconX, beaconY) = r.matchEntire(line)!!.groupValues.drop(1).map { it.toInt() }
-            val distance = abs(sensorX - beaconX) + abs(sensorY - beaconY)
-            Triple(sensorX, sensorY, distance)
-        }
+    private val inputLineRegex = Regex("""^.*x=(-?[0-9]+), y=(-?[0-9]+).+x=(-?[0-9]+), y=(-?[0-9]+).*$""")
 
-        return sensors
-            .map { (x, y, d) ->
-                val dToRow = abs(row - y)
-                val halfIntersectSize = d - dToRow
-                val intersectMinX = x - halfIntersectSize
-                val intersectMaxX = x + halfIntersectSize
-                (intersectMinX..intersectMaxX).toSet()
-            }
-            .reduce { acc, longs -> acc.union(longs) }
-            .count() - 1 // why -1? 🤷 it works though 🤣
-    }
+    fun part1(row: Int): Int = parseSensors()
+        .map { sensor ->
+            val (x, y) = sensor.pos
+            val (bx, by) = sensor.closestBeacon
+            val dToRow = abs(row - y)
+            val halfIntersectSize = sensor.distance - dToRow
+            (x - halfIntersectSize..x + halfIntersectSize).toSet()
+                .let { if (by == row) it - bx else it }
+                // .also { println("$x, $y, ${sensor.distance}, $it") }
+        }
+        .reduce { acc, longs -> acc.union(longs) }
+        .count()
 
     fun part2(): Int = -1
+
+    private fun parseSensors(): Sequence<Sensor> = input
+        .map { line ->
+            val (sensorX, sensorY, beaconX, beaconY) = inputLineRegex.matchEntire(line)!!
+                .groupValues.drop(1).map { it.toInt() }
+            Sensor(
+                pos = sensorX to sensorY,
+                closestBeacon = beaconX to beaconY,
+                distance = abs(sensorX - beaconX) + abs(sensorY - beaconY),
+            )
+        }
+
+    private data class Sensor(
+        val pos: Pos,
+        val closestBeacon: Pos,
+        val distance: Int,
+    )
 }
 
 fun main() {
