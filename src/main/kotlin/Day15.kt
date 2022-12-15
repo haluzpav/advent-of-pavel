@@ -13,12 +13,42 @@ class Day15(inputName: String) {
             val halfIntersectSize = sensor.distance - dToRow
             (x - halfIntersectSize..x + halfIntersectSize).toSet()
                 .let { if (by == row) it - bx else it }
-                // .also { println("$x, $y, ${sensor.distance}, $it") }
         }
         .reduce { acc, longs -> acc.union(longs) }
         .count()
 
-    fun part2(): Int = -1
+    fun part2(max: Int): Long {
+        val sensors = parseSensors().toList()
+        return sensors
+            .flatMap { sensor ->
+                val (x, y) = sensor.pos
+                sequence {
+                    val dJustOutOfRange = sensor.distance + 1
+                    for (i in 0  until  dJustOutOfRange) {
+                        yield(x + i to y - dJustOutOfRange + i)
+                    }
+                    for (i in 0  until  dJustOutOfRange) {
+                        yield(x + dJustOutOfRange - i to y + i)
+                    }
+                    for (i in 0  until  dJustOutOfRange) {
+                        yield(x - i to y + dJustOutOfRange - i)
+                    }
+                    for (i in 0  until  dJustOutOfRange) {
+                        yield(x - dJustOutOfRange + i to y - i)
+                    }
+                }
+            }
+            .filter { (x, y) -> x in 0..max && y in 0..max }
+            .filter { (x, y) ->
+                sensors.all {  sensor ->
+                    val (sx, sy) = sensor.pos
+                    abs(x - sx) + abs(y - sy) > sensor.distance
+                }
+            }
+            .toSet()
+            .single()
+            .let { (x, y) -> x * 4_000_000L + y }
+    }
 
     private fun parseSensors(): Sequence<Sensor> = input
         .map { line ->
@@ -41,5 +71,5 @@ class Day15(inputName: String) {
 fun main() {
     val task = Day15("Day15")
     println(task.part1(row = 2_000_000))
-    println(task.part2())
+    println(task.part2(max = 4_000_000))
 }
