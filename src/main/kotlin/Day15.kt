@@ -24,23 +24,23 @@ class Day15(inputName: String) {
                 val (x, y) = sensor.pos
                 sequence {
                     val dJustOutOfRange = sensor.distance + 1
-                    for (i in 0  until  dJustOutOfRange) {
+                    for (i in 0 until dJustOutOfRange) {
                         yield(x + i to y - dJustOutOfRange + i)
                     }
-                    for (i in 0  until  dJustOutOfRange) {
+                    for (i in 0 until dJustOutOfRange) {
                         yield(x + dJustOutOfRange - i to y + i)
                     }
-                    for (i in 0  until  dJustOutOfRange) {
+                    for (i in 0 until dJustOutOfRange) {
                         yield(x - i to y + dJustOutOfRange - i)
                     }
-                    for (i in 0  until  dJustOutOfRange) {
+                    for (i in 0 until dJustOutOfRange) {
                         yield(x - dJustOutOfRange + i to y - i)
                     }
                 }
             }
             .filter { (x, y) -> x in 0..max && y in 0..max }
             .filter { (x, y) ->
-                sensors.all {  sensor ->
+                sensors.all { sensor ->
                     val (sx, sy) = sensor.pos
                     abs(x - sx) + abs(y - sy) > sensor.distance
                 }
