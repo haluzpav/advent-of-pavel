@@ -33,11 +33,8 @@ class Day15(inputName: String) {
                 }
             }
             .filter { (x, y) -> x in 0..max && y in 0..max }
-            .filter { (x, y) ->
-                sensors.all { sensor ->
-                    val (sx, sy) = sensor.pos
-                    abs(x - sx) + abs(y - sy) > sensor.distance
-                }
+            .filter { pos ->
+                sensors.all { sensor -> pos.manhattanTo(sensor.pos) > sensor.distance }
             }
             .toSet()
             .single()
@@ -48,10 +45,12 @@ class Day15(inputName: String) {
         .map { line ->
             val (sensorX, sensorY, beaconX, beaconY) = inputLineRegex.matchEntire(line)!!
                 .groupValues.drop(1).map { it.toInt() }
+            val sensorPos = sensorX to sensorY
+            val beaconPos = beaconX to beaconY
             Sensor(
-                pos = sensorX to sensorY,
-                closestBeacon = beaconX to beaconY,
-                distance = abs(sensorX - beaconX) + abs(sensorY - beaconY),
+                pos = sensorPos,
+                closestBeacon = beaconPos,
+                distance = sensorPos.manhattanTo(beaconPos),
             )
         }
 

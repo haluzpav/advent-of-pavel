@@ -1,4 +1,5 @@
 import java.io.File
+import kotlin.math.abs
 
 @Suppress("FunctionName")
 private fun InputFile(name: String) = File("inputs", "$name.txt")
@@ -23,5 +24,7 @@ operator fun List<String>.get(pos: Pos): Char = this[pos.first][pos.second]
 operator fun Pos.plus(other: Pos): Pos = first + other.first to second + other.second
 
 operator fun Pos.minus(other: Pos): Pos = first - other.first to second - other.second
+
+fun Pos.manhattanTo(other: Pos): Int = abs(first - other.first) + abs(second - other.second)
 
 operator fun <E> List<E>.component6(): E = this[5]
