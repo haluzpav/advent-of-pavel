@@ -15,10 +15,10 @@ class Day16(inputName: String) {
         val minutes = 30
         for (minute in 1..minutes) {
             println("Minute $minute")
-            if (minute > 7) {
+            if (minute > 5) {
                 // totally legit pruning 👌 😅
                 val maxPressure = paths.maxOf { it.releasedPressure }
-                paths = paths.filter { it.releasedPressure > maxPressure / 3 }
+                paths = paths.filter { it.releasedPressure > maxPressure / 2 }
             }
             paths = paths.flatMap { path ->
                 val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
