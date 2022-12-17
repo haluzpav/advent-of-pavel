@@ -34,23 +34,15 @@ class Day17(inputName: String) {
     )
     private val chamberWidth = 7
 
-    fun part1(): Long = letTheRocksFall(totalRocks = 2_022)
-
-    private fun letTheRocksFall(totalRocks: Long): Long {
-        val jetMoves: List<Int> = input.single().map { jet ->
-            when (jet) {
-                '>' -> 1
-                '<' -> -1
-                else -> error("unknown jet $jet")
-            }
-        }
+    fun part1(): Int {
+        val totalRocks = 2_022
+        val jetMoves: List<Int> = parseJetMoves()
         var lastRockIndex = baseRocks.lastIndex
         var fallingRock: Rock? = null
         var lastJetIndex = jetMoves.lastIndex
         var stoppedRockCount = 0
         val chamber = mutableListOf<MutableList<Char>>()
         val fallMove: Pos = -1 to 0
-        var i = 0
         while (stoppedRockCount < totalRocks) {
             var rock: Rock = getFallingRockOrSpawnNew(fallingRock, lastRockIndex, chamber.size).let { (rock, rockIndex) ->
                 lastRockIndex = rockIndex
@@ -63,34 +55,16 @@ class Day17(inputName: String) {
                 stopRock(chamber, rock)
                 fallingRock = null
                 stoppedRockCount += 1
-                // if (stoppedRockCount.rem(35) == 0) {
-                //     println(i)
-                //     printChamber(chamber, onlyTop = 10)
-                // }
-                // if (stoppedRockCount.rem(1_000_000) == 0) println(stoppedRockCount)
             } else {
                 fallingRock = rock.copy(pos = rock.pos + fallMove)
             }
-            // if (i.rem(200) == 0) {
-            //     println(i)
-            //     printChamber(chamber, onlyTop = 10)
-            // }
-            i++
         }
-        // printChamber(chamber)
-        return chamber.size.toLong()
+        return chamber.size
     }
 
     fun part2(): Long {
         val totalRocks = 1_000_000_000_000
-        // return letTheRocksFall(totalRocks = totalRocks)
-        val jetMoves: List<Int> = input.single().map { jet ->
-            when (jet) {
-                '>' -> 1
-                '<' -> -1
-                else -> error("unknown jet $jet")
-            }
-        }
+        val jetMoves: List<Int> = parseJetMoves()
         var lastRockIndex = baseRocks.lastIndex
         var fallingRock: Rock? = null
         var lastJetIndex = jetMoves.lastIndex
@@ -142,8 +116,8 @@ class Day17(inputName: String) {
         val rockCountRemainingAfterTwoPeriods = totalRocks - stoppedRockCount
         val skippablePeriodCount = rockCountRemainingAfterTwoPeriods / periodRocks
         val rockCountToTopUp = rockCountRemainingAfterTwoPeriods.rem(periodRocks)
-        var toppedUpStoppedRockCount = 0
-        while (toppedUpStoppedRockCount < rockCountToTopUp) {
+        stoppedRockCount = 0
+        while (stoppedRockCount < rockCountToTopUp) {
             var rock: Rock = getFallingRockOrSpawnNew(fallingRock, lastRockIndex, chamber.size).let { (rock, rockIndex) ->
                 lastRockIndex = rockIndex
                 rock
@@ -154,12 +128,20 @@ class Day17(inputName: String) {
             if (isCollision(chamber, rock, fallMove)) {
                 stopRock(chamber, rock)
                 fallingRock = null
-                toppedUpStoppedRockCount += 1
+                stoppedRockCount += 1
             } else {
                 fallingRock = rock.copy(pos = rock.pos + fallMove)
             }
         }
-        return chamber.size.toLong() + periodHeight * skippablePeriodCount
+        return chamber.size + periodHeight * skippablePeriodCount
+    }
+
+    private fun parseJetMoves(): List<Int> = input.single().map { jet ->
+        when (jet) {
+            '>' -> 1
+            '<' -> -1
+            else -> error("unknown jet $jet")
+        }
     }
 
     private fun getFallingRockOrSpawnNew(fallingRock: Rock?, lastRockIndex: Int, chamberSize: Int): Pair<Rock, Int> =
