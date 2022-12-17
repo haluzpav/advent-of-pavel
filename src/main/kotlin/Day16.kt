@@ -4,44 +4,54 @@ class Day16(inputName: String) {
     private val inputRegex = Regex("""^Valve ([A-Z]+) has flow rate=([0-9]+); tunnels? leads? to valves? (.+)$""")
 
     fun part1(): Int {
-        var valves = parseValves()
-        valves = valves.map { if (it.name == "AA") it.copy(cameFrom = listOf(-1)) else it }
+        val valves = parseValves()
+        val startValve = valves.first { it.name == "AA" }
+        var paths = listOf(
+            Path(
+                actions = listOf(Action.Move(from = startValve, to = startValve)),
+                releasedPressure = 0,
+            )
+        )
         val minutes = 30
         for (minute in 1..minutes) {
-            val newValves = valves.map { valve ->
-                val (maxIncoming, maxIncomingFrom) = valve.leadsTo.fold(Int.MIN_VALUE to null as Int?) { (max, i), vi ->
-                    val v = valves[vi]
-                    if (v.cameFrom.isNotEmpty() && v.released > max) v.released to vi else max to i
-                }
-                val canOpenSelf = valve.cameFrom.isNotEmpty() && valve.i !in valve.opened && valve.flow > 0
-                val selfReleasable = if (canOpenSelf) (minutes - minute) * valve.flow else 0
-                val releasedAfterSelfOpen = valve.released + selfReleasable
-                val exploredByIncoming = valve.cameFrom.isEmpty() && maxIncomingFrom != null
-                val overridenByIncoming = maxIncoming > releasedAfterSelfOpen
-                when {
-                    exploredByIncoming || overridenByIncoming -> valve.copy(
-                        cameFrom = valves[maxIncomingFrom!!].cameFrom + maxIncomingFrom,
-                        opened = valves[maxIncomingFrom].opened,
-                        released = maxIncoming,
-                    )
-                    canOpenSelf -> valve.copy(
-                        opened = valve.opened + valve.i,
-                        released = releasedAfterSelfOpen,
-                    )
-                    else -> valve
+            println("Minute $minute")
+            if (minute > 7) {
+                // totally legit pruning 👌 😅
+                val maxPressure = paths.maxOf { it.releasedPressure }
+                paths = paths.filter { it.releasedPressure > maxPressure / 3 }
+            }
+            paths = paths.flatMap { path ->
+                val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
+                val newPressure = path.releasedPressure + openValves.sumOf { it.flow }
+                val currentValve = path.actions.filterIsInstance<Action.Move>().last().to
+                val canOpenCurrentValve = currentValve !in openValves && currentValve.flow > 0
+                val justCameFrom = path.actions.last().let { if (it is Action.Move) it.from else null }
+                buildList {
+                    for (leadsToIndex in currentValve.leadsTo) {
+                        val leadsToValve = valves[leadsToIndex]
+                        if (leadsToValve == justCameFrom) continue
+                        this += Path(
+                            actions = path.actions + Action.Move(from = currentValve, to = leadsToValve),
+                            releasedPressure = newPressure
+                        )
+                    }
+                    if (canOpenCurrentValve) {
+                        this += Path(
+                            actions = path.actions + Action.OpenValve(currentValve),
+                            releasedPressure = newPressure,
+                        )
+                    }
                 }
             }
-            valves = newValves
         }
-        return valves.maxOf { it.released }
+        return paths.maxOf { it.releasedPressure }
     }
 
     fun part2(): Int = -1
 
-    private fun parseValves(): List<Valve> = input.mapIndexed { index, line ->
+    private fun parseValves(): List<Valve> = input.map { line ->
         val (name, flow, leadsTos) = inputRegex.matchEntire(line)!!.destructured
         Valve(
-            i = index,
             name = name,
             flow = flow.toInt(),
         ) to leadsTos.split(", ")
@@ -56,13 +66,29 @@ class Day16(inputName: String) {
     }
 
     private data class Valve(
-        val i: Int,
         val name: String,
         val flow: Int,
         val leadsTo: List<Int> = emptyList(),
-        val cameFrom: List<Int> = emptyList(),
-        val opened: List<Int> = emptyList(),
-        val released: Int = 0,
+    )
+
+    private sealed interface Action {
+        data class Move(
+            val from: Valve,
+            val to: Valve,
+        ) : Action {
+            override fun toString(): String = "move to ${to.name}"
+        }
+
+        data class OpenValve(
+            val valve: Valve,
+        ) : Action {
+            override fun toString(): String = "open ${valve.name}"
+        }
+    }
+
+    private data class Path(
+        val actions: List<Action>,
+        val releasedPressure: Int,
     )
 }
 
