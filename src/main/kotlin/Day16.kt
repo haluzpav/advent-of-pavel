@@ -7,7 +7,7 @@ class Day16(inputName: String) {
         val valves = parseValves()
         val startValve = valves.first { it.name == "AA" }
         var paths = listOf(
-            Path(
+            SinglePath(
                 actions = listOf(Action.Move(from = startValve, to = startValve)),
                 releasedPressure = 0,
             )
@@ -25,13 +25,13 @@ class Day16(inputName: String) {
                     for (leadsToIndex in currentValve.leadsTo) {
                         val leadsToValve = valves[leadsToIndex]
                         if (leadsToValve == justCameFrom) continue
-                        this += Path(
+                        this += SinglePath(
                             actions = path.actions + Action.Move(from = currentValve, to = leadsToValve),
                             releasedPressure = newPressure
                         )
                     }
                     if (canOpenCurrentValve) {
-                        this += Path(
+                        this += SinglePath(
                             actions = path.actions + Action.OpenValve(currentValve),
                             releasedPressure = newPressure,
                         )
@@ -47,7 +47,64 @@ class Day16(inputName: String) {
         return paths.maxOf { it.releasedPressure }
     }
 
-    fun part2(): Int = -1
+    fun part2(): Int {
+        val valves = parseValves()
+        val startValve = valves.first { it.name == "AA" }
+        var paths = listOf(
+            MultiPath(
+                actorActions = listOf(
+                    listOf(Action.Move(from = startValve, to = startValve)),
+                    listOf(Action.Move(from = startValve, to = startValve)),
+                ),
+                releasedPressure = 0,
+            )
+        )
+        val minutes = 26
+        for (minute in 1..minutes) {
+            println("Minute $minute, considering ${paths.size} paths")
+            paths = paths.flatMap { path ->
+                val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
+                val newPressure = path.releasedPressure + openValves.sumOf { it.flow }
+                buildList {
+                    val appendableActorActions: List<List<Action>> = path.actorActions.map { actions ->
+                        buildList {
+                            val currentValve = actions.filterIsInstance<Action.Move>().last().to
+                            val canOpenCurrentValve = currentValve !in openValves && currentValve.flow > 0
+                            val justCameFrom = actions.last().let { if (it is Action.Move) it.from else null }
+                            for (leadsToIndex in currentValve.leadsTo) {
+                                val leadsToValve = valves[leadsToIndex]
+                                if (leadsToValve == justCameFrom) continue
+                                this += Action.Move(from = currentValve, to = leadsToValve)
+                            }
+                            if (canOpenCurrentValve) this += Action.OpenValve(currentValve)
+                        }
+                    }
+                    check(appendableActorActions.size == 2)
+                    for (myAction in appendableActorActions[0]) {
+                        for (elephantAction in appendableActorActions[1]) {
+                            if (myAction is Action.OpenValve && myAction == elephantAction) continue
+                            this += MultiPath(
+                                actorActions = listOf(
+                                    path.actorActions[0] + myAction,
+                                    path.actorActions[1] + elephantAction,
+                                ),
+                                releasedPressure = newPressure,
+                            )
+                        }
+                    }
+                }
+            }
+            if (minute > 5) {
+                // totally legit pruning 👌 😅 I totally not spend an hour tuning 🤣
+                val maxPressure = paths.maxOf { it.releasedPressure }
+                val minPressureToPassCoef = (0.03 * minute + 0.35).coerceIn(0.0..0.85)
+                val minPressureToPass = maxPressure * minPressureToPassCoef
+                paths = paths.filter { it.releasedPressure > minPressureToPass }
+                println("\tpruned with coef $minPressureToPassCoef")
+            }
+        }
+        return paths.maxOf { it.releasedPressure }
+    }
 
     private fun parseValves(): List<Valve> = input.map { line ->
         val (name, flow, leadsTos) = inputRegex.matchEntire(line)!!.destructured
@@ -86,10 +143,17 @@ class Day16(inputName: String) {
         }
     }
 
-    private data class Path(
+    private data class SinglePath(
         val actions: List<Action>,
         val releasedPressure: Int,
     )
+
+    private data class MultiPath(
+        val actorActions: List<List<Action>>,
+        val releasedPressure: Int,
+    ) {
+        val actions: List<Action> get() = actorActions.flatten()
+    }
 }
 
 fun main() {
