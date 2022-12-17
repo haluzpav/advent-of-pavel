@@ -6,7 +6,7 @@ class Day16(inputName: String) {
     fun part1(): Int {
         var valves = parseValves()
         valves = valves.map { if (it.name == "AA") it.copy(cameFrom = listOf(-1)) else it }
-        val minutes = 5
+        val minutes = 30
         for (minute in 1..minutes) {
             val newValves = valves.map { valve ->
                 val (maxIncoming, maxIncomingFrom) = valve.leadsTo.fold(Int.MIN_VALUE to null as Int?) { (max, i), vi ->
