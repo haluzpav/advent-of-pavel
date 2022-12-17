@@ -97,9 +97,10 @@ class Day17(inputName: String) {
         private val chamber: MutableList<MutableList<Char>>,
         private val chamberWidth: Int,
     ) {
-        var lastRockIndex = baseRocks.lastIndex
+        private var lastRockIndex = baseRocks.lastIndex
+        private var lastJetIndex = jetMoves.lastIndex
         var fallingRock: Rock? = null
-        var lastJetIndex = jetMoves.lastIndex
+            private set
         var stoppedRockCount = 0
         var steps = 0
 
@@ -112,13 +113,13 @@ class Day17(inputName: String) {
             val jetMove = (lastJetIndex + 1).rem(jetMoves.size)
                 .also { lastJetIndex = it }
                 .let { 0 to jetMoves[it] }
-            rock = if (isCollision(chamber, rock, jetMove)) {
+            rock = if (isCollision(rock, jetMove)) {
                 rock
             } else {
                 rock.copy(pos = rock.pos + jetMove)
             }
-            fallingRock = if (isCollision(chamber, rock, fallMove)) {
-                stopRock(chamber, rock)
+            fallingRock = if (isCollision(rock, fallMove)) {
+                stopRock(rock)
                 stoppedRockCount += 1
                 null
             } else {
@@ -127,14 +128,14 @@ class Day17(inputName: String) {
             steps++
         }
 
-        private fun isCollision(chamber: List<List<Char>>, rock: Rock, move: Pos): Boolean {
+        private fun isCollision(rock: Rock, move: Pos): Boolean {
             val newRockPos = rock.pos + move
             return rock.blocks.map { it + newRockPos }.all { (x, y) ->
                 y in 0 until chamberWidth && (x > chamber.lastIndex || (x >= 0 && chamber[x][y] == ' '))
             }.not()
         }
 
-        private fun stopRock(chamber: MutableList<MutableList<Char>>, rock: Rock) {
+        private fun stopRock(rock: Rock) {
             rock.blocks.map { it + rock.pos }.forEach { (x, y) ->
                 while (x > chamber.lastIndex) chamber += MutableList(chamberWidth) { ' ' }
                 check(chamber[x][y] == ' ')
