@@ -4,32 +4,22 @@ class Day17(inputName: String) {
         Rock(
             shape = '-',
             blocks = listOf(0 to 0, 0 to 1, 0 to 2, 0 to 3),
-            width = 4,
-            height = 1,
         ),
         Rock(
             shape = '+',
             blocks = listOf(0 to 1, 1 to 0, 1 to 1, 1 to 2, 2 to 1),
-            width = 3,
-            height = 3,
         ),
         Rock(
             shape = 'L',
             blocks = listOf(0 to 0, 0 to 1, 0 to 2, 1 to 2, 2 to 2),
-            width = 3,
-            height = 3,
         ),
         Rock(
             shape = 'I',
             blocks = listOf(0 to 0, 1 to 0, 2 to 0, 3 to 0),
-            width = 1,
-            height = 4,
         ),
         Rock(
             shape = 'D',
             blocks = listOf(0 to 0, 0 to 1, 1 to 0, 1 to 1),
-            width = 2,
-            height = 2,
         ),
     )
     private val chamberWidth = 7
@@ -99,8 +89,6 @@ class Day17(inputName: String) {
         val shape: Char,
         val pos: Pos = -1 to -1,
         val blocks: List<Pos>,
-        val width: Int,
-        val height: Int,
     )
 
     private class RockFallingEngine(
@@ -124,13 +112,17 @@ class Day17(inputName: String) {
             val jetMove = (lastJetIndex + 1).rem(jetMoves.size)
                 .also { lastJetIndex = it }
                 .let { 0 to jetMoves[it] }
-            rock = if (isCollision(chamber, rock, jetMove)) rock else rock.copy(pos = rock.pos + jetMove)
-            if (isCollision(chamber, rock, fallMove)) {
-                stopRock(chamber, rock)
-                fallingRock = null
-                stoppedRockCount += 1
+            rock = if (isCollision(chamber, rock, jetMove)) {
+                rock
             } else {
-                fallingRock = rock.copy(pos = rock.pos + fallMove)
+                rock.copy(pos = rock.pos + jetMove)
+            }
+            fallingRock = if (isCollision(chamber, rock, fallMove)) {
+                stopRock(chamber, rock)
+                stoppedRockCount += 1
+                null
+            } else {
+                rock.copy(pos = rock.pos + fallMove)
             }
             steps++
         }
