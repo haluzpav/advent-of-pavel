@@ -37,102 +37,38 @@ class Day17(inputName: String) {
     fun part1(): Int {
         val totalRocks = 2_022
         val jetMoves: List<Int> = parseJetMoves()
-        var lastRockIndex = baseRocks.lastIndex
-        var fallingRock: Rock? = null
-        var lastJetIndex = jetMoves.lastIndex
-        var stoppedRockCount = 0
-        val chamber = mutableListOf<MutableList<Char>>()
-        val fallMove: Pos = -1 to 0
-        while (stoppedRockCount < totalRocks) {
-            var rock: Rock = getFallingRockOrSpawnNew(fallingRock, lastRockIndex, chamber.size).let { (rock, rockIndex) ->
-                lastRockIndex = rockIndex
-                rock
-            }
-            lastJetIndex = getNextJetIndex(jetMoves.size, lastJetIndex)
-            val jetMove: Pos = 0 to jetMoves[lastJetIndex]
-            rock = if (isCollision(chamber, rock, jetMove)) rock else rock.copy(pos = rock.pos + jetMove)
-            if (isCollision(chamber, rock, fallMove)) {
-                stopRock(chamber, rock)
-                fallingRock = null
-                stoppedRockCount += 1
-            } else {
-                fallingRock = rock.copy(pos = rock.pos + fallMove)
-            }
-        }
+        val chamber: MutableList<MutableList<Char>> = mutableListOf()
+        val engine = RockFallingEngine(baseRocks, jetMoves, chamber, chamberWidth)
+        while (engine.stoppedRockCount < totalRocks) engine.letItFall()
         return chamber.size
     }
 
     fun part2(): Long {
         val totalRocks = 1_000_000_000_000
         val jetMoves: List<Int> = parseJetMoves()
-        var lastRockIndex = baseRocks.lastIndex
-        var fallingRock: Rock? = null
-        var lastJetIndex = jetMoves.lastIndex
-        var stoppedRockCount = 0
-        val chamber = mutableListOf<MutableList<Char>>()
-        val fallMove: Pos = -1 to 0
-        var steps = 0
+        val chamber: MutableList<MutableList<Char>> = mutableListOf()
+        val engine = RockFallingEngine(baseRocks, jetMoves, chamber, chamberWidth)
         val stepPeriod = baseRocks.size * jetMoves.size
-        while (steps < stepPeriod || fallingRock != null) {
-            var rock: Rock = getFallingRockOrSpawnNew(fallingRock, lastRockIndex, chamber.size).let { (rock, rockIndex) ->
-                lastRockIndex = rockIndex
-                rock
-            }
-            lastJetIndex = getNextJetIndex(jetMoves.size, lastJetIndex)
-            val jetMove: Pos = 0 to jetMoves[lastJetIndex]
-            rock = if (isCollision(chamber, rock, jetMove)) rock else rock.copy(pos = rock.pos + jetMove)
-            if (isCollision(chamber, rock, fallMove)) {
-                stopRock(chamber, rock)
-                fallingRock = null
-                stoppedRockCount += 1
-            } else {
-                fallingRock = rock.copy(pos = rock.pos + fallMove)
-            }
-            steps++
-        }
+
+        // period 1 - stabilizing
+        while (engine.steps < stepPeriod || engine.fallingRock != null) engine.letItFall()
         val heightAfterFirstPeriod = chamber.size
-        val rocksAfterFirstPeriod = stoppedRockCount
-        steps = 0
-        while (steps < stepPeriod) {
-            var rock: Rock = getFallingRockOrSpawnNew(fallingRock, lastRockIndex, chamber.size).let { (rock, rockIndex) ->
-                lastRockIndex = rockIndex
-                rock
-            }
-            lastJetIndex = getNextJetIndex(jetMoves.size, lastJetIndex)
-            val jetMove: Pos = 0 to jetMoves[lastJetIndex]
-            rock = if (isCollision(chamber, rock, jetMove)) rock else rock.copy(pos = rock.pos + jetMove)
-            if (isCollision(chamber, rock, fallMove)) {
-                stopRock(chamber, rock)
-                fallingRock = null
-                stoppedRockCount += 1
-            } else {
-                fallingRock = rock.copy(pos = rock.pos + fallMove)
-            }
-            steps++
-        }
-        check(fallingRock == null)
+        val rocksAfterFirstPeriod = engine.stoppedRockCount
+
+        // period 2 - measuring
+        engine.steps = 0
+        while (engine.steps < stepPeriod) engine.letItFall()
+        check(engine.fallingRock == null)
         val periodHeight = chamber.size - heightAfterFirstPeriod
-        val periodRocks = stoppedRockCount - rocksAfterFirstPeriod
-        val rockCountRemainingAfterTwoPeriods = totalRocks - stoppedRockCount
+        val periodRocks = engine.stoppedRockCount - rocksAfterFirstPeriod
+        val rockCountRemainingAfterTwoPeriods = totalRocks - engine.stoppedRockCount
         val skippablePeriodCount = rockCountRemainingAfterTwoPeriods / periodRocks
         val rockCountToTopUp = rockCountRemainingAfterTwoPeriods.rem(periodRocks)
-        stoppedRockCount = 0
-        while (stoppedRockCount < rockCountToTopUp) {
-            var rock: Rock = getFallingRockOrSpawnNew(fallingRock, lastRockIndex, chamber.size).let { (rock, rockIndex) ->
-                lastRockIndex = rockIndex
-                rock
-            }
-            lastJetIndex = getNextJetIndex(jetMoves.size, lastJetIndex)
-            val jetMove: Pos = 0 to jetMoves[lastJetIndex]
-            rock = if (isCollision(chamber, rock, jetMove)) rock else rock.copy(pos = rock.pos + jetMove)
-            if (isCollision(chamber, rock, fallMove)) {
-                stopRock(chamber, rock)
-                fallingRock = null
-                stoppedRockCount += 1
-            } else {
-                fallingRock = rock.copy(pos = rock.pos + fallMove)
-            }
-        }
+
+        // last incomplete period
+        engine.stoppedRockCount = 0
+        while (engine.stoppedRockCount < rockCountToTopUp) engine.letItFall()
+
         return chamber.size + periodHeight * skippablePeriodCount
     }
 
@@ -141,29 +77,6 @@ class Day17(inputName: String) {
             '>' -> 1
             '<' -> -1
             else -> error("unknown jet $jet")
-        }
-    }
-
-    private fun getFallingRockOrSpawnNew(fallingRock: Rock?, lastRockIndex: Int, chamberSize: Int): Pair<Rock, Int> =
-        fallingRock?.let { it to lastRockIndex } ?: run {
-            val newRockIndex = (lastRockIndex + 1).rem(baseRocks.size)
-            baseRocks[newRockIndex].copy(pos = chamberSize + 3 to 2) to newRockIndex
-        }
-
-    private fun getNextJetIndex(jetMovesCount: Int, lastJetIndex: Int): Int = (lastJetIndex + 1).rem(jetMovesCount)
-
-    private fun isCollision(chamber: List<List<Char>>, rock: Rock, move: Pos): Boolean {
-        val newRockPos = rock.pos + move
-        return rock.blocks.map { it + newRockPos }.all { (x, y) ->
-            y in 0 until chamberWidth && (x > chamber.lastIndex || (x >= 0 && chamber[x][y] == ' '))
-        }.not()
-    }
-
-    private fun stopRock(chamber: MutableList<MutableList<Char>>, rock: Rock) {
-        rock.blocks.map { it + rock.pos }.forEach { (x, y) ->
-            while (x > chamber.lastIndex) chamber += MutableList(chamberWidth) { ' ' }
-            check(chamber[x][y] == ' ')
-            chamber[x][y] = rock.shape
         }
     }
 
@@ -189,6 +102,54 @@ class Day17(inputName: String) {
         val width: Int,
         val height: Int,
     )
+
+    private class RockFallingEngine(
+        private val baseRocks: List<Rock>,
+        private val jetMoves: List<Int>,
+        private val chamber: MutableList<MutableList<Char>>,
+        private val chamberWidth: Int,
+    ) {
+        var lastRockIndex = baseRocks.lastIndex
+        var fallingRock: Rock? = null
+        var lastJetIndex = jetMoves.lastIndex
+        var stoppedRockCount = 0
+        var steps = 0
+
+        private val fallMove: Pos = -1 to 0
+
+        fun letItFall() {
+            var rock: Rock = fallingRock ?: (lastRockIndex + 1).rem(baseRocks.size)
+                .also { lastRockIndex = it }
+                .let { baseRocks[it].copy(pos = chamber.size + 3 to 2) }
+            val jetMove = (lastJetIndex + 1).rem(jetMoves.size)
+                .also { lastJetIndex = it }
+                .let { 0 to jetMoves[it] }
+            rock = if (isCollision(chamber, rock, jetMove)) rock else rock.copy(pos = rock.pos + jetMove)
+            if (isCollision(chamber, rock, fallMove)) {
+                stopRock(chamber, rock)
+                fallingRock = null
+                stoppedRockCount += 1
+            } else {
+                fallingRock = rock.copy(pos = rock.pos + fallMove)
+            }
+            steps++
+        }
+
+        private fun isCollision(chamber: List<List<Char>>, rock: Rock, move: Pos): Boolean {
+            val newRockPos = rock.pos + move
+            return rock.blocks.map { it + newRockPos }.all { (x, y) ->
+                y in 0 until chamberWidth && (x > chamber.lastIndex || (x >= 0 && chamber[x][y] == ' '))
+            }.not()
+        }
+
+        private fun stopRock(chamber: MutableList<MutableList<Char>>, rock: Rock) {
+            rock.blocks.map { it + rock.pos }.forEach { (x, y) ->
+                while (x > chamber.lastIndex) chamber += MutableList(chamberWidth) { ' ' }
+                check(chamber[x][y] == ' ')
+                chamber[x][y] = rock.shape
+            }
+        }
+    }
 }
 
 fun main() {
