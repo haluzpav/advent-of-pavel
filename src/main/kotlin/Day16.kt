@@ -14,12 +14,7 @@ class Day16(inputName: String) {
         )
         val minutes = 30
         for (minute in 1..minutes) {
-            println("Minute $minute")
-            if (minute > 5) {
-                // totally legit pruning 👌 😅
-                val maxPressure = paths.maxOf { it.releasedPressure }
-                paths = paths.filter { it.releasedPressure > maxPressure / 2 }
-            }
+            println("Minute $minute, considering ${paths.size} paths")
             paths = paths.flatMap { path ->
                 val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
                 val newPressure = path.releasedPressure + openValves.sumOf { it.flow }
@@ -42,6 +37,11 @@ class Day16(inputName: String) {
                         )
                     }
                 }
+            }
+            if (minute > 5) {
+                // totally legit pruning 👌 😅
+                val maxPressure = paths.maxOf { it.releasedPressure }
+                paths = paths.filter { it.releasedPressure > maxPressure / 2 }
             }
         }
         return paths.maxOf { it.releasedPressure }
