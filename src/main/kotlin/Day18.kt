@@ -62,7 +62,7 @@ class Day18(inputName: String) {
                         val pos = Triple(x, y, z)
                         if (grid[pos] != Block.PocketCandidate) continue
                         val rays = raysFromPos(grid, x, y, z)
-                        val candidateDemoted = rays.all { ray ->
+                        val candidateDemoted = rays.any { ray ->
                             ray.takeWhile { grid[it] != Block.Cube }.any { grid[it] == Block.Air }
                         }
                         if (candidateDemoted) {
@@ -88,11 +88,11 @@ class Day18(inputName: String) {
 
     @Suppress("ReplaceRangeToWithUntil")
     private fun raysFromPos(grid: Grid, x: Int, y: Int, z: Int): Sequence<Sequence<Triple<Int, Int, Int>>> = sequenceOf(
-        sequence { for (rx in grid.xRange.first..x - 1) yield(Triple(rx, y, z)) },
+        sequence { for (rx in (grid.xRange.first..x - 1).reversed()) yield(Triple(rx, y, z)) },
         sequence { for (rx in x + 1..grid.xRange.last) yield(Triple(rx, y, z)) },
-        sequence { for (ry in grid.yRange.first..y - 1) yield(Triple(x, ry, z)) },
+        sequence { for (ry in (grid.yRange.first..y - 1).reversed()) yield(Triple(x, ry, z)) },
         sequence { for (ry in y + 1..grid.yRange.last) yield(Triple(x, ry, z)) },
-        sequence { for (rz in grid.zRange.first..z - 1) yield(Triple(x, y, rz)) },
+        sequence { for (rz in (grid.zRange.first..z - 1).reversed()) yield(Triple(x, y, rz)) },
         sequence { for (rz in z + 1..grid.zRange.last) yield(Triple(x, y, rz)) },
     )
 
