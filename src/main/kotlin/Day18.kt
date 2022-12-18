@@ -26,10 +26,8 @@ class Day18(inputName: String) {
         var exposedSides = 0
         for (i in 0..cubes.lastIndex) {
             exposedSides += 6
-            val (x1, y1, z1) = cubes[i]
             for (j in i..cubes.lastIndex) {
-                val (x2, y2, z2) = cubes[j]
-                if (abs(x1 - x2) + abs(y1 - y2) + abs(z1 - z2) == 1) exposedSides -= 2
+                if (cubes[i].manhattanTo(cubes[j]) == 1) exposedSides -= 2
             }
         }
         return exposedSides

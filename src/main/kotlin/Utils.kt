@@ -25,8 +25,12 @@ operator fun Pos.plus(other: Pos): Pos = first + other.first to second + other.s
 
 operator fun Pos.minus(other: Pos): Pos = first - other.first to second - other.second
 
-fun Pos.manhattanTo(other: Pos): Int = abs(first - other.first) + abs(second - other.second)
+fun Pos.manhattanTo(other: Pos): Int =
+    abs(first - other.first) + abs(second - other.second)
 
 operator fun <E> List<E>.component6(): E = this[5]
 
 typealias Pos3 = Triple<Int, Int, Int>
+
+fun Pos3.manhattanTo(other: Pos3): Int =
+    abs(first - other.first) + abs(second - other.second) + abs(third - other.third)
