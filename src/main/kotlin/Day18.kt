@@ -16,13 +16,13 @@ class Day18(inputName: String) {
         return countExposedSides(cubes + pockets)
     }
 
-    private fun parseCubes(): List<Triple<Int, Int, Int>> = input.map { line ->
+    private fun parseCubes(): List<Pos3> = input.map { line ->
         line.split(",")
             .map { it.toInt() }
-            .let { (x, y, z) -> Triple(x, y, z) }
+            .let { (x, y, z) -> Pos3(x, y, z) }
     }.toList()
 
-    private fun countExposedSides(cubes: List<Triple<Int, Int, Int>>): Int {
+    private fun countExposedSides(cubes: List<Pos3>): Int {
         var exposedSides = 0
         for (i in 0..cubes.lastIndex) {
             exposedSides += 6
@@ -35,13 +35,13 @@ class Day18(inputName: String) {
         return exposedSides
     }
 
-    private fun findPocketCandidates(volume: Volume, cubes: List<Triple<Int, Int, Int>>) = buildList {
+    private fun findPocketCandidates(volume: Volume, cubes: List<Pos3>) = buildList {
         for (x in volume.xRange) {
             for (y in volume.yRange) {
                 for (z in volume.zRange) {
-                    val pos = Triple(x, y, z)
+                    val pos = Pos3(x, y, z)
                     if (pos in cubes) continue
-                    val rays = raysFromPos(volume, x, y, z)
+                    val rays = raysFromPos(pos, volume)
                     val isCandidate = rays.all { ray ->
                         ray.any { it in cubes }
                     }
@@ -51,11 +51,7 @@ class Day18(inputName: String) {
         }
     }
 
-    private fun demoteCandidatesBySpreadingAir(
-        volume: Volume,
-        cubes: List<Triple<Int, Int, Int>>,
-        candidates: List<Triple<Int, Int, Int>>,
-    ): List<Triple<Int, Int, Int>> {
+    private fun demoteCandidatesBySpreadingAir(volume: Volume, cubes: List<Pos3>, candidates: List<Pos3>, ): List<Pos3> {
         var anyCandidateDemoted = true
         var keptCandidates = candidates
         while (anyCandidateDemoted) {
@@ -63,9 +59,9 @@ class Day18(inputName: String) {
             for (x in volume.xRange) {
                 for (y in volume.yRange) {
                     for (z in volume.zRange) {
-                        val pos = Triple(x, y, z)
+                        val pos = Pos3(x, y, z)
                         if (pos !in keptCandidates) continue
-                        val rays = raysFromPos(volume, x, y, z)
+                        val rays = raysFromPos(pos, volume)
                         val candidateDemoted = rays.any { ray ->
                             ray.takeWhile { it !in cubes }.any { it !in keptCandidates }
                         }
@@ -81,16 +77,19 @@ class Day18(inputName: String) {
     }
 
     @Suppress("ReplaceRangeToWithUntil")
-    private fun raysFromPos(volume: Volume, x: Int, y: Int, z: Int): Sequence<Sequence<Triple<Int, Int, Int>>> = sequenceOf(
-        sequence { for (rx in (volume.xRange.first..x - 1).reversed()) yield(Triple(rx, y, z)) },
-        sequence { for (rx in x + 1..volume.xRange.last) yield(Triple(rx, y, z)) },
-        sequence { for (ry in (volume.yRange.first..y - 1).reversed()) yield(Triple(x, ry, z)) },
-        sequence { for (ry in y + 1..volume.yRange.last) yield(Triple(x, ry, z)) },
-        sequence { for (rz in (volume.zRange.first..z - 1).reversed()) yield(Triple(x, y, rz)) },
-        sequence { for (rz in z + 1..volume.zRange.last) yield(Triple(x, y, rz)) },
-    )
+    private fun raysFromPos(pos: Pos3, volume: Volume): Sequence<Sequence<Pos3>> {
+        val (x, y, z) = pos
+        return sequenceOf(
+            sequence { for (rx in (volume.xRange.first..x - 1).reversed()) yield(Pos3(rx, y, z)) },
+            sequence { for (rx in x + 1..volume.xRange.last) yield(Pos3(rx, y, z)) },
+            sequence { for (ry in (volume.yRange.first..y - 1).reversed()) yield(Pos3(x, ry, z)) },
+            sequence { for (ry in y + 1..volume.yRange.last) yield(Pos3(x, ry, z)) },
+            sequence { for (rz in (volume.zRange.first..z - 1).reversed()) yield(Pos3(x, y, rz)) },
+            sequence { for (rz in z + 1..volume.zRange.last) yield(Pos3(x, y, rz)) },
+        )
+    }
 
-    private class Volume(cubes: List<Triple<Int, Int, Int>>) {
+    private class Volume(cubes: List<Pos3>) {
         val xRange = cubes.minOf { it.first }..cubes.maxOf { it.first }
         val yRange = cubes.minOf { it.second }..cubes.maxOf { it.second }
         val zRange = cubes.minOf { it.third }..cubes.maxOf { it.third }
