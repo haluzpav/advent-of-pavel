@@ -7,7 +7,7 @@ class Day16(inputName: String) {
         val valves = parseValves()
         val startValve = valves.first { it.name == "AA" }
         var paths = listOf(
-            SinglePath(
+            Path(
                 actions = listOf(Action.Move(from = startValve, to = startValve)),
                 releasedPressure = 0,
             )
@@ -25,13 +25,13 @@ class Day16(inputName: String) {
                     for (leadsToIndex in currentValve.leadsTo) {
                         val leadsToValve = valves[leadsToIndex]
                         if (leadsToValve == justCameFrom) continue
-                        this += SinglePath(
+                        this += Path(
                             actions = path.actions + Action.Move(from = currentValve, to = leadsToValve),
                             releasedPressure = newPressure
                         )
                     }
                     if (canOpenCurrentValve) {
-                        this += SinglePath(
+                        this += Path(
                             actions = path.actions + Action.OpenValve(currentValve),
                             releasedPressure = newPressure,
                         )
@@ -50,44 +50,61 @@ class Day16(inputName: String) {
     fun part2(): Int {
         val valves = parseValves()
         val startValve = valves.first { it.name == "AA" }
-        var paths = listOf(
-            MultiPath(
-                actorActions = listOf(
-                    listOf(Action.Move(from = startValve, to = startValve)),
-                    listOf(Action.Move(from = startValve, to = startValve)),
-                ),
+        var actionNodes = listOf(
+            ActionNodePair(
+                me = ActionNode(action = ActionNode.Action.Move, from = null, valve = startValve),
+                elephant = ActionNode(action = ActionNode.Action.Move, from = null, valve = startValve),
                 releasedPressure = 0,
-            )
+            ),
         )
         val minutes = 26
         for (minute in 1..minutes) {
-            println("Minute $minute, considering ${paths.size} paths")
-            paths = paths.flatMap { path ->
-                val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
-                val newPressure = path.releasedPressure + openValves.sumOf { it.flow }
+            println("Minute $minute, considering ${actionNodes.size} nodes")
+            actionNodes = actionNodes.flatMap { actionNodePair ->
+                val openValves: List<Valve> = buildList {
+                    var n: ActionNode? = actionNodePair.me
+                    while (n != null) {
+                        if (n.action == ActionNode.Action.Open) this += n.valve
+                        n = n.from
+                    }
+                    n = actionNodePair.elephant
+                    while (n != null) {
+                        if (n.action == ActionNode.Action.Open) this += n.valve
+                        n = n.from
+                    }
+                }
+                val newPressure = actionNodePair.releasedPressure + openValves.sumOf { it.flow }
                 buildList {
-                    val appendableActorActions: List<List<Action>> = path.actorActions.map { actions ->
+                    val appendableActorActionNodes: List<List<ActionNode>> = listOf(
+                        actionNodePair.me,
+                        actionNodePair.elephant
+                    ).map { actionNode ->
                         buildList {
-                            val currentValve = actions.filterIsInstance<Action.Move>().last().to
+                            val currentValve = listOf(actionNode, actionNode.from)
+                                .firstNotNullOf { if (it?.action == ActionNode.Action.Move) it.valve else null }
                             val canOpenCurrentValve = currentValve !in openValves && currentValve.flow > 0
-                            val justCameFrom = actions.last().let { if (it is Action.Move) it.from else null }
+                            val justCameFrom = actionNode.from?.valve
                             for (leadsToIndex in currentValve.leadsTo) {
                                 val leadsToValve = valves[leadsToIndex]
                                 if (leadsToValve == justCameFrom) continue
-                                this += Action.Move(from = currentValve, to = leadsToValve)
+                                this += ActionNode(action = ActionNode.Action.Move, from = actionNode, valve = leadsToValve)
                             }
-                            if (canOpenCurrentValve) this += Action.OpenValve(currentValve)
+                            if (canOpenCurrentValve) this += ActionNode(
+                                action = ActionNode.Action.Open,
+                                from = actionNode,
+                                valve = currentValve,
+                            )
                         }
                     }
-                    check(appendableActorActions.size == 2)
-                    for (myAction in appendableActorActions[0]) {
-                        for (elephantAction in appendableActorActions[1]) {
-                            if (myAction is Action.OpenValve && myAction == elephantAction) continue
-                            this += MultiPath(
-                                actorActions = listOf(
-                                    path.actorActions[0] + myAction,
-                                    path.actorActions[1] + elephantAction,
-                                ),
+                    for (myActionNode in appendableActorActionNodes[0]) {
+                        for (elephantActionNode in appendableActorActionNodes[1]) {
+                            val bothOpeningSameValve = myActionNode.action == ActionNode.Action.Open
+                                && elephantActionNode.action == ActionNode.Action.Open
+                                && myActionNode.valve == elephantActionNode.valve
+                            if (bothOpeningSameValve) continue
+                            this += ActionNodePair(
+                                me = myActionNode,
+                                elephant = elephantActionNode,
                                 releasedPressure = newPressure,
                             )
                         }
@@ -96,14 +113,14 @@ class Day16(inputName: String) {
             }
             if (minute > 5) {
                 // totally legit pruning 👌 😅 I totally not spend an hour tuning 🤣
-                val maxPressure = paths.maxOf { it.releasedPressure }
-                val minPressureToPassCoef = (0.03 * minute + 0.35).coerceIn(0.0..0.85)
+                val maxPressure = actionNodes.maxOf { it.releasedPressure }
+                val minPressureToPassCoef = (0.03 * minute + 0.35).coerceIn(0.0..0.82)
                 val minPressureToPass = maxPressure * minPressureToPassCoef
-                paths = paths.filter { it.releasedPressure > minPressureToPass }
+                actionNodes = actionNodes.filter { it.releasedPressure > minPressureToPass }
                 println("\tpruned with coef $minPressureToPassCoef")
             }
         }
-        return paths.maxOf { it.releasedPressure }
+        return actionNodes.maxOf { it.releasedPressure }
     }
 
     private fun parseValves(): List<Valve> = input.map { line ->
@@ -143,17 +160,31 @@ class Day16(inputName: String) {
         }
     }
 
-    private data class SinglePath(
+    private data class Path(
         val actions: List<Action>,
         val releasedPressure: Int,
     )
 
-    private data class MultiPath(
-        val actorActions: List<List<Action>>,
-        val releasedPressure: Int,
+    private data class ActionNode(
+        val action: Action,
+        val from: ActionNode?,
+        val valve: Valve,
     ) {
-        val actions: List<Action> get() = actorActions.flatten()
+        override fun toString(): String = when (action) {
+            Action.Move -> "move to ${valve.name}"
+            Action.Open -> "open ${valve.name}"
+        }
+
+        enum class Action {
+            Move, Open
+        }
     }
+
+    private data class ActionNodePair(
+        val me: ActionNode,
+        val elephant: ActionNode,
+        val releasedPressure: Int,
+    )
 }
 
 fun main() {
