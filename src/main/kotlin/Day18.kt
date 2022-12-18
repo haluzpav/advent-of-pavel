@@ -10,10 +10,9 @@ class Day18(inputName: String) {
 
     fun part2(): Int {
         val cubes = parseCubes()
-        val grid = Grid(cubes)
-        findPocketCandidates(grid)
-        demoteCandidatesBySpreadingAir(grid)
-        val pockets = getPockets(grid)
+        val volume = Volume(cubes)
+        val candidates = findPocketCandidates(volume, cubes)
+        val pockets = demoteCandidatesBySpreadingAir(volume, cubes, candidates)
         return countExposedSides(cubes + pockets)
     }
 
@@ -36,88 +35,65 @@ class Day18(inputName: String) {
         return exposedSides
     }
 
-    private fun findPocketCandidates(grid: Grid) {
-        for (x in grid.xRange) {
-            for (y in grid.yRange) {
-                for (z in grid.zRange) {
+    private fun findPocketCandidates(volume: Volume, cubes: List<Triple<Int, Int, Int>>) = buildList {
+        for (x in volume.xRange) {
+            for (y in volume.yRange) {
+                for (z in volume.zRange) {
                     val pos = Triple(x, y, z)
-                    if (grid[pos] != Block.Air) continue
-                    val rays = raysFromPos(grid, x, y, z)
+                    if (pos in cubes) continue
+                    val rays = raysFromPos(volume, x, y, z)
                     val isCandidate = rays.all { ray ->
-                        ray.any { grid[it] == Block.Cube }
+                        ray.any { it in cubes }
                     }
-                    if (isCandidate) grid[pos] = Block.PocketCandidate
+                    if (isCandidate) this += pos
                 }
             }
         }
     }
 
-    private fun demoteCandidatesBySpreadingAir(grid: Grid) {
+    private fun demoteCandidatesBySpreadingAir(
+        volume: Volume,
+        cubes: List<Triple<Int, Int, Int>>,
+        candidates: List<Triple<Int, Int, Int>>,
+    ): List<Triple<Int, Int, Int>> {
         var anyCandidateDemoted = true
+        var keptCandidates = candidates
         while (anyCandidateDemoted) {
             anyCandidateDemoted = false
-            for (x in grid.xRange) {
-                for (y in grid.yRange) {
-                    for (z in grid.zRange) {
+            for (x in volume.xRange) {
+                for (y in volume.yRange) {
+                    for (z in volume.zRange) {
                         val pos = Triple(x, y, z)
-                        if (grid[pos] != Block.PocketCandidate) continue
-                        val rays = raysFromPos(grid, x, y, z)
+                        if (pos !in keptCandidates) continue
+                        val rays = raysFromPos(volume, x, y, z)
                         val candidateDemoted = rays.any { ray ->
-                            ray.takeWhile { grid[it] != Block.Cube }.any { grid[it] == Block.Air }
+                            ray.takeWhile { it !in cubes }.any { it !in keptCandidates }
                         }
                         if (candidateDemoted) {
-                            grid[pos] = Block.Air
+                            keptCandidates = keptCandidates - pos
                             anyCandidateDemoted = true
                         }
                     }
                 }
             }
         }
-    }
-
-    private fun getPockets(grid: Grid): List<Triple<Int, Int, Int>> = buildList {
-        for (x in grid.xRange) {
-            for (y in grid.yRange) {
-                for (z in grid.zRange) {
-                    val pos = Triple(x, y, z)
-                    if (grid[pos] == Block.PocketCandidate) this += pos
-                }
-            }
-        }
+        return keptCandidates
     }
 
     @Suppress("ReplaceRangeToWithUntil")
-    private fun raysFromPos(grid: Grid, x: Int, y: Int, z: Int): Sequence<Sequence<Triple<Int, Int, Int>>> = sequenceOf(
-        sequence { for (rx in (grid.xRange.first..x - 1).reversed()) yield(Triple(rx, y, z)) },
-        sequence { for (rx in x + 1..grid.xRange.last) yield(Triple(rx, y, z)) },
-        sequence { for (ry in (grid.yRange.first..y - 1).reversed()) yield(Triple(x, ry, z)) },
-        sequence { for (ry in y + 1..grid.yRange.last) yield(Triple(x, ry, z)) },
-        sequence { for (rz in (grid.zRange.first..z - 1).reversed()) yield(Triple(x, y, rz)) },
-        sequence { for (rz in z + 1..grid.zRange.last) yield(Triple(x, y, rz)) },
+    private fun raysFromPos(volume: Volume, x: Int, y: Int, z: Int): Sequence<Sequence<Triple<Int, Int, Int>>> = sequenceOf(
+        sequence { for (rx in (volume.xRange.first..x - 1).reversed()) yield(Triple(rx, y, z)) },
+        sequence { for (rx in x + 1..volume.xRange.last) yield(Triple(rx, y, z)) },
+        sequence { for (ry in (volume.yRange.first..y - 1).reversed()) yield(Triple(x, ry, z)) },
+        sequence { for (ry in y + 1..volume.yRange.last) yield(Triple(x, ry, z)) },
+        sequence { for (rz in (volume.zRange.first..z - 1).reversed()) yield(Triple(x, y, rz)) },
+        sequence { for (rz in z + 1..volume.zRange.last) yield(Triple(x, y, rz)) },
     )
 
-    private class Grid(cubes: List<Triple<Int, Int, Int>>) {
+    private class Volume(cubes: List<Triple<Int, Int, Int>>) {
         val xRange = cubes.minOf { it.first }..cubes.maxOf { it.first }
         val yRange = cubes.minOf { it.second }..cubes.maxOf { it.second }
         val zRange = cubes.minOf { it.third }..cubes.maxOf { it.third }
-        private val grid: List<List<MutableList<Block>>> = xRange.map { x ->
-            yRange.map { y ->
-                zRange.map { z ->
-                    if (Triple(x, y, z) in cubes) Block.Cube else Block.Air
-                }.toMutableList()
-            }
-        }
-
-        operator fun get(pos: Triple<Int, Int, Int>): Block =
-            grid[pos.first - xRange.first][pos.second - yRange.first][pos.third - zRange.first]
-
-        operator fun set(pos: Triple<Int, Int, Int>, value: Block) {
-            grid[pos.first - xRange.first][pos.second - yRange.first][pos.third - zRange.first] = value
-        }
-    }
-
-    private enum class Block {
-        Air, Cube, PocketCandidate
     }
 }
 
