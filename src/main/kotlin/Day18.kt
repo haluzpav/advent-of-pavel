@@ -14,7 +14,6 @@ class Day18(inputName: String) {
         findPocketCandidates(grid)
         demoteCandidatesBySpreadingAir(grid)
         val pockets = getPockets(grid)
-        pockets.forEach { println(it) }
         return countExposedSides(cubes + pockets)
     }
 
@@ -37,21 +36,13 @@ class Day18(inputName: String) {
         return exposedSides
     }
 
-    @Suppress("ReplaceRangeToWithUntil")
     private fun findPocketCandidates(grid: Grid) {
         for (x in grid.xRange) {
             for (y in grid.yRange) {
                 for (z in grid.zRange) {
                     val pos = Triple(x, y, z)
                     if (grid[pos] != Block.Air) continue
-                    val rays = sequenceOf(
-                        sequence { for (rx in grid.xRange.first..x - 1) yield(Triple(rx, y, z)) },
-                        sequence { for (rx in x + 1..grid.xRange.last) yield(Triple(rx, y, z)) },
-                        sequence { for (ry in grid.yRange.first..y - 1) yield(Triple(x, ry, z)) },
-                        sequence { for (ry in y + 1..grid.yRange.last) yield(Triple(x, ry, z)) },
-                        sequence { for (rz in grid.zRange.first..z - 1) yield(Triple(x, y, rz)) },
-                        sequence { for (rz in z + 1..grid.zRange.last) yield(Triple(x, y, rz)) },
-                    )
+                    val rays = raysFromPos(grid, x, y, z)
                     val isCandidate = rays.all { ray ->
                         ray.any { grid[it] == Block.Cube }
                     }
@@ -63,24 +54,17 @@ class Day18(inputName: String) {
 
     private fun demoteCandidatesBySpreadingAir(grid: Grid) {
         var anyCandidateDemoted = true
-        var i = 0
         while (anyCandidateDemoted) {
-            println(i++)
             anyCandidateDemoted = false
             for (x in grid.xRange) {
                 for (y in grid.yRange) {
                     for (z in grid.zRange) {
                         val pos = Triple(x, y, z)
                         if (grid[pos] != Block.PocketCandidate) continue
-                        val neighbors = listOfNotNull(
-                            Triple(x - 1, y, z).takeIf { it.first in grid.xRange },
-                            Triple(x + 1, y, z).takeIf { it.first in grid.xRange },
-                            Triple(x, y - 1, z).takeIf { it.second in grid.yRange },
-                            Triple(x, y + 1, z).takeIf { it.second in grid.yRange },
-                            Triple(x, y, z - 1).takeIf { it.third in grid.zRange },
-                            Triple(x, y, z + 1).takeIf { it.third in grid.zRange },
-                        )
-                        val candidateDemoted = neighbors.any { grid[it] == Block.Air }
+                        val rays = raysFromPos(grid, x, y, z)
+                        val candidateDemoted = rays.all { ray ->
+                            ray.takeWhile { grid[it] != Block.Cube }.any { grid[it] == Block.Air }
+                        }
                         if (candidateDemoted) {
                             grid[pos] = Block.Air
                             anyCandidateDemoted = true
@@ -101,6 +85,16 @@ class Day18(inputName: String) {
             }
         }
     }
+
+    @Suppress("ReplaceRangeToWithUntil")
+    private fun raysFromPos(grid: Grid, x: Int, y: Int, z: Int): Sequence<Sequence<Triple<Int, Int, Int>>> = sequenceOf(
+        sequence { for (rx in grid.xRange.first..x - 1) yield(Triple(rx, y, z)) },
+        sequence { for (rx in x + 1..grid.xRange.last) yield(Triple(rx, y, z)) },
+        sequence { for (ry in grid.yRange.first..y - 1) yield(Triple(x, ry, z)) },
+        sequence { for (ry in y + 1..grid.yRange.last) yield(Triple(x, ry, z)) },
+        sequence { for (rz in grid.zRange.first..z - 1) yield(Triple(x, y, rz)) },
+        sequence { for (rz in z + 1..grid.zRange.last) yield(Triple(x, y, rz)) },
+    )
 
     private class Grid(cubes: List<Triple<Int, Int, Int>>) {
         val xRange = cubes.minOf { it.first }..cubes.maxOf { it.first }
