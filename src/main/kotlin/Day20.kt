@@ -1,8 +1,23 @@
 class Day20(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 
-    fun part1(): Int {
-        val list = input.map { it.toInt() }.toMutableList()
+    fun part1(): Long {
+        val list = parseList().toList()
+        val mixedList = mix(list)
+        return getGroveCoors(mixedList)
+    }
+
+    fun part2(): Long {
+        val list = parseList()
+        val decryptedList = list.map { it * 811_589_153 }.toList()
+        val mixedList = (1..10).fold(decryptedList) { acc, _ -> mix(acc) }
+        return getGroveCoors(mixedList)
+    }
+
+    private fun parseList(): Sequence<Long> = input.map { it.toLong() }
+
+    private fun mix(originalList: List<Long>): List<Long> {
+        val list = originalList.toMutableList()
         val size = list.size
         val isMoved = MutableList(size) { false }
         val cycleSize = size - 1
@@ -12,7 +27,7 @@ class Day20(inputName: String) {
             isMoved.removeAt(index)
         }
 
-        fun add(index: Int, value: Int) {
+        fun add(index: Int, value: Long) {
             list.add(index, value)
             isMoved.add(index, true)
         }
@@ -20,7 +35,8 @@ class Day20(inputName: String) {
         var index = 0
         while (index < size) {
             val n = list[index]
-            val newPos = (index + n + 2 * cycleSize).rem(cycleSize)
+            val newPosMaybeNegative = (index + n).rem(cycleSize).toInt()
+            val newPos = (newPosMaybeNegative + cycleSize).rem(cycleSize)
             when {
                 newPos == index -> {
                     isMoved[index] = true
@@ -36,13 +52,16 @@ class Day20(inputName: String) {
             }
             while (index < size && isMoved[index]) index++
         }
-        val zeroIndex = list.indexOf(0)
-        return listOf(1000, 2000, 3000).sumOf {
-            list[(zeroIndex + it).rem(size)]
-        }
+        check(list.size == originalList.size)
+        return list
     }
 
-    fun part2(): Int = -1
+    private fun getGroveCoors(list: List<Long>): Long {
+        val zeroIndex = list.indexOf(0)
+        return listOf(1000, 2000, 3000).sumOf {
+            list[(zeroIndex + it).rem(list.size)]
+        }
+    }
 }
 
 fun main() {

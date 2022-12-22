@@ -16,6 +16,6 @@ class Day20Test {
     @Test
     fun testPart2() {
         val task = Day20("Day20_test")
-        assertEquals(-1, task.part2())
+        assertEquals(1_623_178_306, task.part2())
     }
 }
