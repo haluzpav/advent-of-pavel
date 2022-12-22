@@ -12,17 +12,17 @@ class Day19Test {
     @Test
     fun testPart1Blueprint1() {
         val blueprint = task.parseBlueprints().first()
-        assertEquals(9, task.calcMaxGeodes(blueprint))
+        assertEquals(9, task.calcMaxGeodes(blueprint, minutes = 24, pruningSlope = 0.5))
     }
 
     @Test
     fun testPart1Blueprint2() {
         val blueprint = task.parseBlueprints().last()
-        assertEquals(12, task.calcMaxGeodes(blueprint))
+        assertEquals(12, task.calcMaxGeodes(blueprint, minutes = 24, pruningSlope = 0.5))
     }
 
     @Test
     fun testPart2() {
-        assertEquals(-1, task.part2())
+        assertEquals(3472, task.part2())
     }
 }

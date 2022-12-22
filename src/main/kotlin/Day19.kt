@@ -12,7 +12,11 @@ class Day19(inputName: String) {
     )
 
     fun part1(): Int = parseBlueprints()
-        .sumOf { it.id * calcMaxGeodes(it) }
+        .sumOf { it.id * calcMaxGeodes(it, minutes = 24, pruningSlope = 0.5) }
+
+    fun part2(): Int = parseBlueprints()
+        .take(3)
+        .fold(1) { acc, blueprint -> acc * calcMaxGeodes(blueprint, minutes = 32, pruningSlope = 1.4) }
 
     fun parseBlueprints(): Sequence<Blueprint> = input.map { line ->
         val ints = inputRegex.matchEntire(line)!!.groupValues.drop(1).map { it.toInt() }
@@ -39,13 +43,11 @@ class Day19(inputName: String) {
         )
     }
 
-    fun calcMaxGeodes(blueprint: Blueprint): Int {
-        val minutes = 24
+    fun calcMaxGeodes(blueprint: Blueprint, minutes: Int, pruningSlope: Double): Int {
         check(blueprint.robots.size == Resource.values().size)
         check(blueprint.robots.zip(Resource.values()) { robot, resource -> robot.produces == resource }.all { it })
         val zeroResources = List(Resource.values().size) { 0 }
         val startNode = Node(
-            // factoryAction = FactoryAction.Build(blueprint.robots.first()),
             robotCounts = List(blueprint.robots.size) { if (it == 0) 1 else 0 },
             resourceCounts = zeroResources,
             skippedRobots = emptySet(),
@@ -67,7 +69,7 @@ class Day19(inputName: String) {
         }
         var totalPruned = 0
         for (minute in 1..minutes) {
-            val minPerformanceCoefficient = 0.5 / minutes * minute
+            val minPerformanceCoefficient = (pruningSlope / minutes * minute).coerceIn(0.0..0.9)
             val maxPerformance = leafNodes.maxOf { it.performance }
             listOf(
                 "blueprint ${blueprint.id}",
@@ -114,12 +116,10 @@ class Day19(inputName: String) {
                         emptySet()
                     }
                     Node(
-                        // factoryAction = action,
                         robotCounts = robotCounts,
                         resourceCounts = resourceCounts,
                         skippedRobots = newSkippedRobots,
                         performance = performance,
-                        // node = node,
                     )
                 }
             }
@@ -129,7 +129,6 @@ class Day19(inputName: String) {
         return leafNodes.maxOf { it.resourceCounts[3] }
     }
 
-    // pointless for part 1, let's see part 2 // TODO maybe remove
     private fun calcPerformance(
         blueprint: Blueprint,
         minutes: Int,
@@ -151,15 +150,11 @@ class Day19(inputName: String) {
     private fun haveEnoughQuantities(costs: List<Int>, stock: List<Int>): Boolean =
         Resource.values().indices.all { stock[it] >= costs[it] }
 
-    fun part2(): Int = -1
-
     private data class Node(
-        // val factoryAction: FactoryAction?,
         val robotCounts: List<Int>,
         val resourceCounts: List<Int>,
         val skippedRobots: Set<Int>,
         val performance: Int,
-        // val previousNode: Node? = null,
     )
 
     private sealed interface FactoryAction {
