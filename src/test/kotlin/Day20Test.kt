@@ -10,7 +10,7 @@ class Day20Test {
     @Test
     fun testPart1_2() {
         val task = Day20("Day20_test_2")
-        assertEquals(69, task.part1())
+        assertEquals(4, task.part1())
     }
 
     @Test

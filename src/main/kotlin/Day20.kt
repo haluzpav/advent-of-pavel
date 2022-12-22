@@ -5,6 +5,7 @@ class Day20(inputName: String) {
         val list = input.map { it.toInt() }.toMutableList()
         val size = list.size
         val isMoved = MutableList(size) { false }
+        val cycleSize = size - 1
 
         fun removeAt(index: Int) {
             list.removeAt(index)
@@ -19,12 +20,7 @@ class Day20(inputName: String) {
         var index = 0
         while (index < size) {
             val n = list[index]
-            val newPos = (index + n + (if (n > 0) 1 else 0) + 2 * size).rem(size)
-            // listOf(
-            //     "index $index",
-            //     "n $n",
-            //     "newPos $newPos",
-            // ).joinToString().also { println(it) }
+            val newPos = (index + n + 2 * cycleSize).rem(cycleSize)
             when {
                 newPos == index -> {
                     isMoved[index] = true
@@ -34,12 +30,11 @@ class Day20(inputName: String) {
                     add(newPos, n)
                 }
                 else -> {
-                    add(newPos, n)
+                    add(newPos + 1, n)
                     removeAt(index)
                 }
             }
             while (index < size && isMoved[index]) index++
-            // println(list)
         }
         val zeroIndex = list.indexOf(0)
         return listOf(1000, 2000, 3000).sumOf {
