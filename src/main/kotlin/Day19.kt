@@ -45,26 +45,54 @@ class Day19(inputName: String) {
         check(blueprint.robots.zip(Resource.values()) { robot, resource -> robot.produces == resource }.all { it })
         val zeroResources = List(Resource.values().size) { 0 }
         val startNode = Node(
-            // minute = 0,
             // factoryAction = FactoryAction.Build(blueprint.robots.first()),
             robotCounts = List(blueprint.robots.size) { if (it == 0) 1 else 0 },
             resourceCounts = zeroResources,
+            skippedRobots = emptySet(),
             performance = 0, // whatever
         )
-        var leafNodes = linkedSetOf(startNode)
+        val nodeComparator: (Node, Node) -> Int = { p0, p1 ->
+            // effectively make the Set based only on Node.resourceCounts and Node.robotCounts
+            sequence {
+                for (i in Resource.values().indices) yield(p0.resourceCounts[i].compareTo(p1.resourceCounts[i]))
+                for (i in blueprint.robots.indices) yield(p0.robotCounts[i].compareTo(p1.robotCounts[i]))
+            }.firstOrNull { it != 0 } ?: 0
+        }
+        var leafNodes = sortedSetOf<Node>(nodeComparator, startNode)
+        val maxResourcesForRobot = Resource.values().map { resource ->
+            when (resource) {
+                Resource.Geode -> Int.MAX_VALUE
+                else -> blueprint.robots.maxOf { it.costs[resource.ordinal] }
+            }
+        }
+        var totalPruned = 0
         for (minute in 1..minutes) {
-            val minPerformanceCoefficient = 0.7 / minutes * minute
+            val minPerformanceCoefficient = 0.5 / minutes * minute
             val maxPerformance = leafNodes.maxOf { it.performance }
-            println("blueprint ${blueprint.id}, minute $minute, leaf nodes ${leafNodes.size}, lastMinuteMaxPerformance $maxPerformance, minPerformanceCoefficient $minPerformanceCoefficient")
+            listOf(
+                "blueprint ${blueprint.id}",
+                "minute $minute",
+                "leaf nodes ${leafNodes.size}",
+                "lastMinuteMaxPerformance $maxPerformance",
+                "minPerformanceCoefficient %.2f".format(minPerformanceCoefficient),
+            ).joinToString().also { println(it) }
 
-            val newLeafNodes = linkedSetOf<Node>()
+            val newLeafNodes = sortedSetOf<Node>(nodeComparator)
             for (node in leafNodes) {
-                if (minute > 13 && node.performance < maxPerformance * minPerformanceCoefficient) continue
+                if (minute > 13 && node.performance < maxPerformance * minPerformanceCoefficient) {
+                    totalPruned++
+                    continue
+                }
                 val newActions = if (minute < minutes) {
-                    listOf(FactoryAction.Wait) + blueprint.robots
-                        .filter { haveEnoughQuantities(it.costs, node.resourceCounts) }
-                        .filterNot { it.produces == Resource.Ore && node.robotCounts[0] >= 4 }
+                    val buildRobotActions = blueprint.robots
+                        .filterIndexed { index, robot ->
+                            index !in node.skippedRobots
+                                && node.robotCounts[index] < maxResourcesForRobot[robot.produces.ordinal]
+                                && haveEnoughQuantities(robot.costs, node.resourceCounts)
+                        }
                         .map { FactoryAction.Build(it) }
+                    val skippedRobots = buildRobotActions.map { blueprint.robots.indexOf(it.robot) }.toSet()
+                    listOf(FactoryAction.Wait(skippedRobots)) + buildRobotActions
                 } else {
                     listOf(null)
                 }
@@ -80,11 +108,16 @@ class Day19(inputName: String) {
                         if (index == builtRobotIndex) count + 1 else count
                     }
                     val performance = calcPerformance(blueprint, minutes, minute, resourceCounts, robotCounts)
+                    val newSkippedRobots = if (action is FactoryAction.Wait) {
+                        node.skippedRobots + action.skippedRobots
+                    } else {
+                        emptySet()
+                    }
                     Node(
-                        // minute = minute,
                         // factoryAction = action,
                         robotCounts = robotCounts,
                         resourceCounts = resourceCounts,
+                        skippedRobots = newSkippedRobots,
                         performance = performance,
                         // node = node,
                     )
@@ -92,9 +125,11 @@ class Day19(inputName: String) {
             }
             leafNodes = newLeafNodes
         }
+        println("totalPruned $totalPruned")
         return leafNodes.maxOf { it.resourceCounts[3] }
     }
 
+    // pointless for part 1, let's see part 2 // TODO maybe remove
     private fun calcPerformance(
         blueprint: Blueprint,
         minutes: Int,
@@ -119,16 +154,19 @@ class Day19(inputName: String) {
     fun part2(): Int = -1
 
     private data class Node(
-        // val minute: Int,
         // val factoryAction: FactoryAction?,
         val robotCounts: List<Int>,
         val resourceCounts: List<Int>,
+        val skippedRobots: Set<Int>,
         val performance: Int,
         // val previousNode: Node? = null,
     )
 
     private sealed interface FactoryAction {
-        object Wait : FactoryAction
+        data class Wait(
+            val skippedRobots: Set<Int>,
+        ) : FactoryAction
+
         data class Build(
             val robot: Robot,
         ) : FactoryAction
