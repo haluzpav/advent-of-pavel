@@ -8,12 +8,12 @@ class Day22(inputName: String) {
         for (instruction in instructions) {
             if (instruction is Instruction.Forward) {
                 for (step in 1..instruction.count) {
-                    when (val forwardPos = pos + getStepMove(direction)) {
-                        in tiles -> pos = forwardPos
-                        in walls -> Unit
+                    pos = when (val forwardPos = pos + getStepMove(direction)) {
+                        in tiles -> forwardPos
+                        in walls -> pos
                         else -> when (val wrapAroundPos = findWrapAroundPos(tiles, walls, pos, direction)) {
-                            in tiles -> pos = wrapAroundPos
-                            in walls -> Unit
+                            in tiles -> wrapAroundPos
+                            in walls -> pos
                             else -> error("stepped back out of grid")
                         }
                     }
@@ -21,7 +21,6 @@ class Day22(inputName: String) {
             } else {
                 direction = updateDirection(direction, instruction)
             }
-            println("$instruction ->\n\t$pos, $direction")
         }
         val (x, y) = pos
         return 1_000 * (x + 1) + 4 * (y + 1) + direction.ordinal
@@ -75,14 +74,11 @@ class Day22(inputName: String) {
         return Triple(tiles, walls, instructions)
     }
 
-    private fun updateDirection(current: Direction, instruction: Instruction): Direction {
-        val rotation = when (instruction) {
-            is Instruction.Forward -> 0
-            Instruction.TurnLeft -> -1
-            Instruction.TurnRight -> 1
-        }
-        return current.rotateBy(rotation)
-    }
+    private fun updateDirection(current: Direction, instruction: Instruction): Direction = when (instruction) {
+        is Instruction.Forward -> 0
+        Instruction.TurnLeft -> -1
+        Instruction.TurnRight -> 1
+    }.let { current.rotateBy(it) }
 
     private fun getStepMove(direction: Direction): Pos = when (direction) {
         Direction.Right -> 0 to 1
