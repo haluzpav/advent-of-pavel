@@ -42,30 +42,15 @@ class Day23(inputName: String) {
         val proposedMoves = mutableMapOf<Pos, List<Pos>>() // proposed pos, to proposing elves
         val surroundedElves = mutableSetOf<Pos>()
         for (elf in elves) {
-            val (x, y) = elf
             val emptyDirections: List<Direction> = directions.filter { direction ->
-                when (direction) {
-                    Direction.North -> listOf(x - 1 to y - 1, x - 1 to y, x - 1 to y + 1)
-                    Direction.South -> listOf(x + 1 to y - 1, x + 1 to y, x + 1 to y + 1)
-                    Direction.West -> listOf(x - 1 to y - 1, x to y - 1, x + 1 to y - 1)
-                    Direction.East -> listOf(x - 1 to y + 1, x to y + 1, x + 1 to y + 1)
-                }.all { it !in elves }
+                direction.neighborFov.all { (elf + it) !in elves }
             }
-            val proposedMove: Pos? = emptyDirections
-                .takeIf { it.size < Direction.values().size }
-                ?.firstNotNullOfOrNull { direction ->
-                    when (direction) {
-                        Direction.North -> x - 1 to y
-                        Direction.South -> x + 1 to y
-                        Direction.West -> x to y - 1
-                        Direction.East -> x to y + 1
-                    }
-                }
-            if (proposedMove != null) {
+            if (emptyDirections.isEmpty() || emptyDirections.size == Direction.values().size) {
+                surroundedElves += elf
+            } else {
+                val proposedMove = elf + emptyDirections.first().neighborFov[1]
                 val oldProposingElves = proposedMoves[proposedMove] ?: emptyList()
                 proposedMoves[proposedMove] = oldProposingElves + elf
-            } else {
-                surroundedElves += elf
             }
         }
 
@@ -85,8 +70,11 @@ class Day23(inputName: String) {
         return newElves
     }
 
-    private enum class Direction {
-        North, South, West, East
+    private enum class Direction(val neighborFov: List<Pos>) {
+        North(listOf(-1 to -1, -1 to 0, -1 to 1)),
+        South(listOf(1 to -1, 1 to 0, 1 to 1)),
+        West(listOf(-1 to -1, 0 to -1, 1 to -1)),
+        East(listOf(-1 to 1, 0 to 1, 1 to 1)),
     }
 }
 
