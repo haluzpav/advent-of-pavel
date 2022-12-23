@@ -81,7 +81,7 @@ class Day22(inputName: String) {
             Instruction.TurnLeft -> -1
             Instruction.TurnRight -> 1
         }
-        return Direction.values()[(current.ordinal + rotation + Direction.values().size).rem(Direction.values().size)]
+        return current.rotateBy(rotation)
     }
 
     private fun getStepMove(direction: Direction): Pos = when (direction) {
@@ -92,7 +92,7 @@ class Day22(inputName: String) {
     }
 
     private fun findWrapAroundPos(tiles: Set<Pos>, walls: Set<Pos>, edgePos: Pos, edgeDirection: Direction): Pos {
-        val backDirection = Direction.values()[(edgeDirection.ordinal + 2).rem(Direction.values().size)]
+        val backDirection = edgeDirection.rotateBy(2)
         var backPos = edgePos
         while (true) {
             val newBackPos = backPos + getStepMove(backDirection)

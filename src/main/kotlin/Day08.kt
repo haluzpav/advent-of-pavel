@@ -1,12 +1,11 @@
 class Day08(inputName: String) {
     private val input: List<String> = loadInput(inputName)
     private val treesInRow: Int = input.lastIndex
-    private val dirSize = Direction.values().size
 
     fun part1(): Int {
         val visiblePoses = mutableSetOf<Pos>()
         for (direction in Direction.values()) {
-            val sideStepDirection = Direction.values()[(direction.ordinal - 1 + dirSize).rem(dirSize)]
+            val sideStepDirection = direction.rotateBy(-1)
             var rowStart: Pos? = when (direction) {
                 Direction.N -> treesInRow to treesInRow
                 Direction.E -> treesInRow to 0

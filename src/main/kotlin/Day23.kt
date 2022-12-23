@@ -36,9 +36,7 @@ class Day23(inputName: String) {
 
     private fun moveElves(round: Int, elves: Set<Pos>): Set<Pos> {
         // first half
-        val directions = Direction.values().indices.map { i ->
-            Direction.values()[(i + round - 1).rem(Direction.values().size)]
-        }
+        val directions = Direction.values().map { it.rotateBy(round - 1) }
         val proposedMoves = mutableMapOf<Pos, List<Pos>>() // proposed pos, to proposing elves
         val surroundedElves = mutableSetOf<Pos>()
         for (elf in elves) {

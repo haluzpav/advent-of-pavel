@@ -34,3 +34,11 @@ typealias Pos3 = Triple<Int, Int, Int>
 
 fun Pos3.manhattanTo(other: Pos3): Int =
     abs(first - other.first) + abs(second - other.second) + abs(third - other.third)
+
+inline fun <reified T : Enum<T>> T.rotateBy(rotations: Int): T {
+    val values = enumValues<T>()
+    val size = values.size
+    val positiveCount = rotations.rem(size) + size
+    val index = (ordinal + positiveCount).rem(size)
+    return values[index]
+}
