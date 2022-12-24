@@ -3,27 +3,49 @@ import java.util.PriorityQueue
 class Day24(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 
-    fun part1(): Int {
+    fun part1(): Int = goThroughValley(SnacksState.Forgotten)
+
+    fun part2(): Int = goThroughValley(SnacksState.ReturningWith)
+
+    private fun goThroughValley(targetSnacks: SnacksState): Int {
         val winds = parseWinds()
         val valleyRegionX = winds[Direction.Right.ordinal].indices
         val valleyRegionY = winds[Direction.Down.ordinal].indices
         val startPos = valleyRegionX.first - 1 to valleyRegionY.first
         val endPos = valleyRegionX.last + 1 to valleyRegionY.last
-        fun Node.priority(): Int = pos.manhattanTo(endPos) + minute
+        val startToEndManhattan = startPos.manhattanTo(endPos)
+
+        fun SnacksState.hiddenDistance() = (targetSnacks.ordinal - ordinal) * startToEndManhattan
+
+        fun SnacksState.targetPos() = when (this) {
+            SnacksState.Forgotten, SnacksState.ReturningWith -> endPos
+            SnacksState.ReturningFor -> startPos
+        }
+
+        fun Node.priority(): Int = snacks.hiddenDistance() + pos.manhattanTo(snacks.targetPos()) + minute
+
+        fun Node.isAtEndWithSnacks(): Boolean = pos == endPos && snacks == targetSnacks
+
         val nodeComparator = Comparator<Node> { node0, node1 -> node0.priority() - node1.priority() }
         val nodes = PriorityQueue(nodeComparator) // these java collections fking suck
-        nodes += Node(startPos, minute = 0)
+        nodes += Node(startPos, minute = 0, snacks = SnacksState.Forgotten)
         var handledNodes = 0
-        while (nodes.isNotEmpty() && nodes.peek().pos != endPos) {
+        while (nodes.isNotEmpty() && !nodes.peek().isAtEndWithSnacks()) {
             val node = nodes.poll()
             val (pos, minute) = node
             if (handledNodes.rem(10_000) == 0) listOf(
                 "$handledNodes handled nodes",
                 "${nodes.size} nodes to explore",
-                "current priority is ${node.priority()} (distance to end ${pos.manhattanTo(endPos)}, minute $minute)",
+                "current priority is ${node.priority()} (" +
+                    listOf(
+                        "${node.snacks}",
+                        "distance to target ${pos.manhattanTo(node.snacks.targetPos())}",
+                        "minute $minute",
+                    ).joinToString() +
+                    ")",
             ).joinToString().also { println(it) }
             val nextMinute = minute + 1
-            if (!hasAnyWind(pos, nextMinute, winds)) nodes.addIfNotPresent(Node(pos, nextMinute))
+            if (!hasAnyWind(pos, nextMinute, winds)) nodes.addIfNotPresent(node.copy(minute = nextMinute))
             for (direction in Direction.values()) {
                 val newPos = pos + getStepMove(direction)
                 val (nx, ny) = newPos
@@ -31,7 +53,13 @@ class Day24(inputName: String) {
                 val isAtEntrances = newPos == startPos || newPos == endPos
                 if (!isInValley && !isAtEntrances) continue
                 if (hasAnyWind(newPos, nextMinute, winds)) continue
-                nodes.addIfNotPresent(Node(newPos, nextMinute))
+                val updateSnacks = node.snacks < targetSnacks && when (node.snacks) {
+                    SnacksState.Forgotten -> newPos == endPos
+                    SnacksState.ReturningFor -> newPos == startPos
+                    SnacksState.ReturningWith -> false
+                }
+                val newSnacks = node.snacks.let { if (updateSnacks) it.rotateBy(1) else it }
+                nodes.addIfNotPresent(Node(newPos, nextMinute, newSnacks))
             }
             handledNodes++
         }
@@ -53,8 +81,6 @@ class Day24(inputName: String) {
             }
         }
     }
-
-    fun part2(): Int = -1
 
     /** @return wind direction, to list of currents, to winds in a current */
     private fun parseWinds(): List<List<List<Boolean>>> {
@@ -99,7 +125,12 @@ class Day24(inputName: String) {
     private data class Node(
         val pos: Pos,
         val minute: Int,
+        val snacks: SnacksState,
     )
+
+    private enum class SnacksState {
+        Forgotten, ReturningFor, ReturningWith
+    }
 }
 
 fun main() {
