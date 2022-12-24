@@ -38,7 +38,10 @@ fun Pos3.manhattanTo(other: Pos3): Int =
 inline fun <reified T : Enum<T>> T.rotateBy(rotations: Int): T {
     val values = enumValues<T>()
     val size = values.size
-    val positiveCount = rotations.rem(size) + size
-    val index = (ordinal + positiveCount).rem(size)
+    val index = (ordinal + rotations).positiveRem(size)
     return values[index]
 }
+
+fun Int.positiveRem(other: Int): Int = (rem(other) + other).rem(other)
+
+fun <T> List<T>.getWrapped(index: Int) = this[index.positiveRem(size)]
