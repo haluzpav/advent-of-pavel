@@ -45,3 +45,9 @@ inline fun <reified T : Enum<T>> T.rotateBy(rotations: Int): T {
 fun Int.positiveRem(other: Int): Int = (rem(other) + other).rem(other)
 
 fun <T> List<T>.getWrapped(index: Int) = this[index.positiveRem(size)]
+
+operator fun Pair<IntRange, IntRange>.contains(pos: Pos): Boolean {
+    val (xRange, yRange) = this
+    val (x, y) = pos
+    return x in xRange && y in yRange
+}

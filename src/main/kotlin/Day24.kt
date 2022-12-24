@@ -11,15 +11,24 @@ class Day24(inputName: String) {
         val winds = parseWinds()
         val valleyRegionX = winds[Direction.Right.ordinal].indices
         val valleyRegionY = winds[Direction.Down.ordinal].indices
+        val valleyRegion = valleyRegionX to valleyRegionY
         val startPos = valleyRegionX.first - 1 to valleyRegionY.first
         val endPos = valleyRegionX.last + 1 to valleyRegionY.last
         val startToEndManhattan = startPos.manhattanTo(endPos)
+
+        fun Pos.isValid(): Boolean = this in valleyRegion || this == startPos || this == endPos
 
         fun SnacksState.hiddenDistance() = (targetSnacks.ordinal - ordinal) * startToEndManhattan
 
         fun SnacksState.targetPos() = when (this) {
             SnacksState.Forgotten, SnacksState.ReturningWith -> endPos
             SnacksState.ReturningFor -> startPos
+        }
+
+        fun SnacksState.canUpdate(pos: Pos) = this < targetSnacks && when (this) {
+            SnacksState.Forgotten -> pos == endPos
+            SnacksState.ReturningFor -> pos == startPos
+            SnacksState.ReturningWith -> false
         }
 
         fun Node.priority(): Int = snacks.hiddenDistance() + pos.manhattanTo(snacks.targetPos()) + minute
@@ -29,52 +38,47 @@ class Day24(inputName: String) {
         val nodeComparator = Comparator<Node> { node0, node1 -> node0.priority() - node1.priority() }
         val nodes = PriorityQueue(nodeComparator) // these java collections fking suck
         nodes += Node(startPos, minute = 0, snacks = SnacksState.Forgotten)
-        var handledNodes = 0
+        var exploredNodes = 0
+
+        fun logState(node: Node) {
+            if (exploredNodes.rem(10_000) == 0) listOf(
+                "$exploredNodes explored nodes",
+                "${nodes.size} nodes to explore",
+                "current priority is ${node.priority()} " + listOf(
+                    "${node.snacks}",
+                    "distance to target ${node.pos.manhattanTo(node.snacks.targetPos())}",
+                    "minute ${node.minute}",
+                ).joinToString(prefix = "(", postfix = ")"),
+            ).joinToString().also { println(it) }
+        }
+
         while (nodes.isNotEmpty() && !nodes.peek().isAtEndWithSnacks()) {
             val node = nodes.poll()
-            val (pos, minute) = node
-            if (handledNodes.rem(10_000) == 0) listOf(
-                "$handledNodes explored nodes",
-                "${nodes.size} nodes to explore",
-                "current priority is ${node.priority()} (" +
-                    listOf(
-                        "${node.snacks}",
-                        "distance to target ${pos.manhattanTo(node.snacks.targetPos())}",
-                        "minute $minute",
-                    ).joinToString() +
-                    ")",
-            ).joinToString().also { println(it) }
-            val nextMinute = minute + 1
-            if (!hasAnyWind(pos, nextMinute, winds)) nodes.addIfNotPresent(node.copy(minute = nextMinute))
+            logState(node)
+            val nextMinute = node.minute + 1
+            if (!hasAnyWind(node.pos, nextMinute, winds)) nodes.addIfNotPresent(node.copy(minute = nextMinute))
             for (direction in Direction.values()) {
-                val newPos = pos + getStepMove(direction)
-                val (nx, ny) = newPos
-                val isInValley = nx in valleyRegionX && ny in valleyRegionY
-                val isAtEntrances = newPos == startPos || newPos == endPos
-                if (!isInValley && !isAtEntrances) continue
-                if (hasAnyWind(newPos, nextMinute, winds)) continue
-                val updateSnacks = node.snacks < targetSnacks && when (node.snacks) {
-                    SnacksState.Forgotten -> newPos == endPos
-                    SnacksState.ReturningFor -> newPos == startPos
-                    SnacksState.ReturningWith -> false
-                }
-                if (updateSnacks) {
-                    nodes.clear() // we can just wait at entrances if needed
-                    val newSnacks = node.snacks.rotateBy(1)
-                    nodes += Node(newPos, nextMinute, newSnacks)
-                    break
-                } else {
-                    nodes.addIfNotPresent(node.copy(pos = newPos, minute = nextMinute))
+                val newPos = node.pos + getStepMove(direction)
+                when {
+                    !newPos.isValid() || hasAnyWind(newPos, nextMinute, winds) -> continue
+                    node.snacks.canUpdate(newPos) -> {
+                        nodes.clear() // we can just wait at entrances if needed
+                        val newSnacks = node.snacks.rotateBy(1)
+                        nodes += Node(newPos, nextMinute, newSnacks)
+                        break
+                    }
+                    else -> nodes.addIfNotPresent(node.copy(pos = newPos, minute = nextMinute))
                 }
             }
-            handledNodes++
+            exploredNodes++
         }
-        println("reached end after $handledNodes nodes explored")
+        println("reached end after $exploredNodes nodes explored")
+
         return nodes.peek().minute
     }
 
     private fun hasAnyWind(pos: Pos, minute: Int, winds: List<List<List<Boolean>>>): Boolean {
-        val (x, y) = pos
+        val (x, y) = pos // x could be at entrances where there are no winds
         return Direction.values().any { direction ->
             val directionWinds = winds[direction.ordinal]
             val minuteShift = when (direction) {
