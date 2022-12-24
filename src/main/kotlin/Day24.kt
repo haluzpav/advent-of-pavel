@@ -34,7 +34,7 @@ class Day24(inputName: String) {
             val node = nodes.poll()
             val (pos, minute) = node
             if (handledNodes.rem(10_000) == 0) listOf(
-                "$handledNodes handled nodes",
+                "$handledNodes explored nodes",
                 "${nodes.size} nodes to explore",
                 "current priority is ${node.priority()} (" +
                     listOf(
@@ -58,8 +58,14 @@ class Day24(inputName: String) {
                     SnacksState.ReturningFor -> newPos == startPos
                     SnacksState.ReturningWith -> false
                 }
-                val newSnacks = node.snacks.let { if (updateSnacks) it.rotateBy(1) else it }
-                nodes.addIfNotPresent(Node(newPos, nextMinute, newSnacks))
+                if (updateSnacks) {
+                    nodes.clear() // we can just wait at entrances if needed
+                    val newSnacks = node.snacks.rotateBy(1)
+                    nodes += Node(newPos, nextMinute, newSnacks)
+                    break
+                } else {
+                    nodes.addIfNotPresent(node.copy(pos = newPos, minute = nextMinute))
+                }
             }
             handledNodes++
         }
