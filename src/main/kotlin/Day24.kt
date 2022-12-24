@@ -1,3 +1,5 @@
+import java.util.PriorityQueue
+
 class Day24(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 
@@ -7,27 +9,34 @@ class Day24(inputName: String) {
         val valleyRegionY = winds[Direction.Down.ordinal].indices
         val startPos = valleyRegionX.first - 1 to valleyRegionY.first
         val endPos = valleyRegionX.last + 1 to valleyRegionY.last
-        var minute = 0
-        var poses = listOf(startPos)
-        while (minute < Int.MAX_VALUE && endPos !in poses) {
-            minute++
-            println("Minute $minute, poses ${poses.size}")
-            val newPoses = mutableListOf<Pos>()
-            for (pos in poses) {
-                if (!hasAnyWind(pos, minute, winds)) newPoses += pos
-                for (direction in Direction.values()) {
-                    val newPos = pos + getStepMove(direction)
-                    val (nx, ny) = newPos
-                    val isInValley = nx in valleyRegionX && ny in valleyRegionY
-                    val isAtEntrances = newPos == startPos || newPos == endPos
-                    if (!isInValley && !isAtEntrances) continue
-                    if (hasAnyWind(newPos, minute, winds)) continue
-                    newPoses += newPos
-                }
+        fun Node.priority(): Int = pos.manhattanTo(endPos) + minute
+        val nodeComparator = Comparator<Node> { node0, node1 -> node0.priority() - node1.priority() }
+        val nodes = PriorityQueue(nodeComparator) // these java collections fking suck
+        nodes += Node(startPos, minute = 0)
+        var handledNodes = 0
+        while (nodes.isNotEmpty() && nodes.peek().pos != endPos) {
+            val node = nodes.poll()
+            val (pos, minute) = node
+            if (handledNodes.rem(10_000) == 0) listOf(
+                "$handledNodes handled nodes",
+                "${nodes.size} nodes to explore",
+                "current priority is ${node.priority()} (distance to end ${pos.manhattanTo(endPos)}, minute $minute)",
+            ).joinToString().also { println(it) }
+            val nextMinute = minute + 1
+            if (!hasAnyWind(pos, nextMinute, winds)) nodes.addIfNotPresent(Node(pos, nextMinute))
+            for (direction in Direction.values()) {
+                val newPos = pos + getStepMove(direction)
+                val (nx, ny) = newPos
+                val isInValley = nx in valleyRegionX && ny in valleyRegionY
+                val isAtEntrances = newPos == startPos || newPos == endPos
+                if (!isInValley && !isAtEntrances) continue
+                if (hasAnyWind(newPos, nextMinute, winds)) continue
+                nodes.addIfNotPresent(Node(newPos, nextMinute))
             }
-            poses = newPoses
+            handledNodes++
         }
-        return minute
+        println("reached end after $handledNodes nodes explored")
+        return nodes.peek().minute
     }
 
     private fun hasAnyWind(pos: Pos, minute: Int, winds: List<List<List<Boolean>>>): Boolean {
@@ -81,9 +90,16 @@ class Day24(inputName: String) {
         Direction.Up -> -1 to 0
     }
 
+    private fun <T> PriorityQueue<T>.addIfNotPresent(item: T): Boolean = if (item !in this) add(item) else false
+
     private enum class Direction {
         Right, Down, Left, Up
     }
+
+    private data class Node(
+        val pos: Pos,
+        val minute: Int,
+    )
 }
 
 fun main() {
