@@ -1,5 +1,8 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.Pos
+import cz.veleto.aoc.core.minus
+import cz.veleto.aoc.core.readInput
 import java.lang.Integer.max
 import kotlin.math.absoluteValue
 import kotlin.math.sign

@@ -1,5 +1,9 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.Pos
+import cz.veleto.aoc.core.plus
+import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.rotateBy
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 

@@ -1,5 +1,8 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.splitBy
+
 class Day01(inputName: String) {
     private val input: List<String> = loadInput(inputName)
 

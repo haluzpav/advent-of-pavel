@@ -1,5 +1,10 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.Pos
+import cz.veleto.aoc.core.plus
+import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.rotateBy
+
 class Day23(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 

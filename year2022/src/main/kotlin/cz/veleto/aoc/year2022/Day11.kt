@@ -1,5 +1,8 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.component6
+import cz.veleto.aoc.core.readInput
+
 class Day11(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 

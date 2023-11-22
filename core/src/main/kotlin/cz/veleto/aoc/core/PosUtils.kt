@@ -1,0 +1,24 @@
+package cz.veleto.aoc.core
+
+import kotlin.math.abs
+
+typealias Pos = Pair<Int, Int>
+typealias Pos3 = Triple<Int, Int, Int>
+
+operator fun List<String>.get(pos: Pos): Char = this[pos.first][pos.second]
+
+operator fun Pos.plus(other: Pos): Pos = first + other.first to second + other.second
+
+operator fun Pos.minus(other: Pos): Pos = first - other.first to second - other.second
+
+fun Pos.manhattanTo(other: Pos): Int =
+    abs(first - other.first) + abs(second - other.second)
+
+fun Pos3.manhattanTo(other: Pos3): Int =
+    abs(first - other.first) + abs(second - other.second) + abs(third - other.third)
+
+operator fun Pair<IntRange, IntRange>.contains(pos: Pos): Boolean {
+    val (xRange, yRange) = this
+    val (x, y) = pos
+    return x in xRange && y in yRange
+}

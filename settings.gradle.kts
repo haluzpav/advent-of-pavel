@@ -7,4 +7,6 @@ pluginManagement {
     }
 }
 
+include("core")
 include("year2022")
+include("year2023")

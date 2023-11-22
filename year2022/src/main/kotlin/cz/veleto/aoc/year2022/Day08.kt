@@ -1,5 +1,10 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.Pos
+import cz.veleto.aoc.core.get
+import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.rotateBy
+
 class Day08(inputName: String) {
     private val input: List<String> = loadInput(inputName)
     private val treesInRow: Int = input.lastIndex

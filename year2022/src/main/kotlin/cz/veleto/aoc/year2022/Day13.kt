@@ -1,5 +1,6 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.readInput
 import kotlin.math.min
 
 class Day13(inputName: String) {

@@ -1,6 +1,8 @@
 package cz.veleto.aoc.year2022
 
-import kotlin.math.abs
+import cz.veleto.aoc.core.Pos3
+import cz.veleto.aoc.core.manhattanTo
+import cz.veleto.aoc.core.readInput
 
 class Day18(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)

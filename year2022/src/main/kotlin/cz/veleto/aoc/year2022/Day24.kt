@@ -1,5 +1,12 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.Pos
+import cz.veleto.aoc.core.contains
+import cz.veleto.aoc.core.getWrapped
+import cz.veleto.aoc.core.manhattanTo
+import cz.veleto.aoc.core.plus
+import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.rotateBy
 import java.util.PriorityQueue
 
 class Day24(inputName: String) {

@@ -1,5 +1,8 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.Pos
+import cz.veleto.aoc.core.manhattanTo
+import cz.veleto.aoc.core.readInput
 import kotlin.math.abs
 
 class Day15(inputName: String) {

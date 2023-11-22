@@ -1,5 +1,7 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.loadInput
+
 class Day05(inputName: String) {
     private val input: List<String> = loadInput(inputName)
 
