@@ -1,15 +1,9 @@
 plugins {
-    kotlin("jvm") version "1.7.22"
+    kotlin("jvm") version "1.9.20"
 }
 
 repositories {
     mavenCentral()
-}
-
-tasks {
-    wrapper {
-        gradleVersion = "7.6"
-    }
 }
 
 dependencies {
@@ -18,4 +12,8 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+kotlin {
+    jvmToolchain(17)
 }

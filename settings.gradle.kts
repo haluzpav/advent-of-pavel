@@ -1,1 +1,8 @@
-rootProject.name = "advent-of-pavel-2022"
+rootProject.name = "Advent of Pavel"
+
+pluginManagement {
+    repositories {
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
