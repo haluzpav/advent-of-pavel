@@ -6,3 +6,5 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+include("year2022")
