@@ -12,6 +12,7 @@ fun readInput(name: String): Sequence<String> = sequence {
     yieldAll(InputFile(name).bufferedReader().lineSequence())
 }
 
+@Suppress("RemoveExplicitTypeArguments")
 fun <T, U> Iterable<T>.splitBy(predicate: (T) -> Boolean, mapElement: (T) -> U): List<List<U>> =
     fold(mutableListOf(mutableListOf<U>())) { acc, s ->
         if (predicate(s)) acc += mutableListOf<U>()
