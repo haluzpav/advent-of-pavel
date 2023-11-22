@@ -1,15 +1,10 @@
-# advent-of-pavel-2022
+# Advent of Pavel
 
-Welcome to the Advent of Code[^aoc] Kotlin project created by [haluzpav][github] using the [Advent of Code Kotlin Template][template] delivered by JetBrains.
+Project containing my implementation of [Advent of Code][aoc][^aoc].
 
-In this repository, haluzpav is about to provide solutions for the puzzles using [Kotlin][kotlin] language.
+Written in plain Kotlin on JVM, using Gradle for build system, and JUnit for unit-tests.
 
-If you're stuck with Kotlin-specific questions or anything related to this template, check out the following resources:
-
-- [Kotlin docs][docs]
-- [Kotlin Slack][slack]
-- Template [issue tracker][issues]
-
+Each year is in separate `yearYYYY` module, with `core` module containing shared helper functions.
 
 [^aoc]:
     [Advent of Code][aoc] – An annual event of Christmas-oriented programming challenges started December 2015.
