@@ -9,7 +9,7 @@ import cz.veleto.aoc.core.readInput
 import cz.veleto.aoc.core.rotateBy
 import java.util.PriorityQueue
 
-class Day24(inputName: String) {
+class Day24(inputName: String, private val log: Boolean = false) {
     private val input: Sequence<String> = readInput(inputName)
 
     fun part1(): Int = goThroughValley(SnacksState.Forgotten)
@@ -63,7 +63,7 @@ class Day24(inputName: String) {
 
         while (nodes.isNotEmpty() && !nodes.peek().isAtEndWithSnacks()) {
             val node = nodes.poll()
-            logState(node)
+            if (log) logState(node)
             val nextMinute = node.minute + 1
             if (!hasAnyWind(node.pos, nextMinute, winds)) nodes.addIfNotPresent(node.copy(minute = nextMinute))
             for (direction in Direction.values()) {
@@ -81,7 +81,7 @@ class Day24(inputName: String) {
             }
             exploredNodes++
         }
-        println("reached end after $exploredNodes nodes explored")
+        if (log) println("reached end after $exploredNodes nodes explored")
 
         return nodes.peek().minute
     }
@@ -153,7 +153,7 @@ class Day24(inputName: String) {
 }
 
 fun main() {
-    val task = Day24("Day24")
+    val task = Day24("Day24", log = true)
     println(task.part1())
     println(task.part2())
 }

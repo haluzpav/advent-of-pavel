@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.readInput
 
-class Day19(inputName: String) {
+class Day19(inputName: String, private val log: Boolean = false) {
     private val input: Sequence<String> = readInput(inputName)
 
     private val inputRegex = Regex(
@@ -81,7 +81,7 @@ class Day19(inputName: String) {
                 "leaf nodes ${leafNodes.size}",
                 "lastMinuteMaxPerformance $maxPerformance",
                 "minPerformanceCoefficient %.2f".format(minPerformanceCoefficient),
-            ).joinToString().also { println(it) }
+            ).joinToString().also { if (log) println(it) }
 
             val newLeafNodes = sortedSetOf<Node>(nodeComparator)
             for (node in leafNodes) {
@@ -129,7 +129,7 @@ class Day19(inputName: String) {
             }
             leafNodes = newLeafNodes
         }
-        println("totalPruned $totalPruned")
+        if (log) println("totalPruned $totalPruned")
         return leafNodes.maxOf { it.resourceCounts[3] }
     }
 
@@ -190,7 +190,7 @@ class Day19(inputName: String) {
 }
 
 fun main() {
-    val task = Day19("Day19")
+    val task = Day19("Day19", log = true)
     println(task.part1())
     println(task.part2())
 }

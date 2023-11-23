@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.plus
 import cz.veleto.aoc.core.readInput
 import cz.veleto.aoc.core.rotateBy
 
-class Day23(inputName: String) {
+class Day23(inputName: String, private val log: Boolean = false) {
     private val input: Sequence<String> = readInput(inputName)
 
     fun part1(): Int {
@@ -29,7 +29,7 @@ class Day23(inputName: String) {
             round++
             val newElves = moveElves(round, elves)
             anyElvesMoved = newElves != elves
-            println("Round $round, movedElves ${(newElves - elves).size}")
+            if (log) println("Round $round, movedElves ${(newElves - elves).size}")
             elves = newElves
         }
         return round
@@ -84,7 +84,7 @@ class Day23(inputName: String) {
 }
 
 fun main() {
-    val task = Day23("Day23")
+    val task = Day23("Day23", log = true)
     println(task.part1())
     println(task.part2())
 }

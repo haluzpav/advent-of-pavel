@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.readInput
 
-class Day16(inputName: String) {
+class Day16(inputName: String, private val log: Boolean = false) {
     private val input: Sequence<String> = readInput(inputName)
 
     private val inputRegex = Regex("""^Valve ([A-Z]+) has flow rate=([0-9]+); tunnels? leads? to valves? (.+)$""")
@@ -18,7 +18,7 @@ class Day16(inputName: String) {
         )
         val minutes = 30
         for (minute in 1..minutes) {
-            println("Minute $minute, considering ${paths.size} paths")
+            if (log) println("Minute $minute, considering ${paths.size} paths")
             paths = paths.flatMap { path ->
                 val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
                 val newPressure = path.releasedPressure + openValves.sumOf { it.flow }
@@ -63,7 +63,7 @@ class Day16(inputName: String) {
         )
         val minutes = 26
         for (minute in 1..minutes) {
-            println("Minute $minute, considering ${actionNodes.size} nodes")
+            if (log) println("Minute $minute, considering ${actionNodes.size} nodes")
             actionNodes = actionNodes.flatMap { actionNodePair ->
                 val openValves: List<Valve> = buildList {
                     var n: ActionNode? = actionNodePair.me
@@ -121,7 +121,7 @@ class Day16(inputName: String) {
                 val minPressureToPassCoef = (0.03 * minute + 0.35).coerceIn(0.0..0.82)
                 val minPressureToPass = maxPressure * minPressureToPassCoef
                 actionNodes = actionNodes.filter { it.releasedPressure > minPressureToPass }
-                println("\tpruned with coef $minPressureToPassCoef")
+                if (log) println("\tpruned with coef $minPressureToPassCoef")
             }
         }
         return actionNodes.maxOf { it.releasedPressure }
@@ -192,7 +192,7 @@ class Day16(inputName: String) {
 }
 
 fun main() {
-    val task = Day16("Day16")
+    val task = Day16("Day16", log = true)
     println(task.part1())
     println(task.part2())
 }

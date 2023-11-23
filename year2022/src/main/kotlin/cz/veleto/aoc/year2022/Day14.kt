@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.readInput
 import kotlin.math.max
 import kotlin.math.min
 
-class Day14(inputName: String) {
+class Day14(inputName: String, private val log: Boolean = false) {
     private val input: Sequence<String> = readInput(inputName)
 
     private val xShift = -300
@@ -27,7 +27,7 @@ class Day14(inputName: String) {
                 lastSandPos = letSandFall(grid, lastSandPos)
             }
         }
-        printGrid(grid)
+        if (log) printGrid(grid)
         return sandCount - 1
     }
 
@@ -48,7 +48,7 @@ class Day14(inputName: String) {
                 lastSandPos = letSandFall(grid, lastSandPos)
             }
         }
-        printGrid(grid)
+        if (log) printGrid(grid)
         return sandCount
     }
 
@@ -115,7 +115,7 @@ class Day14(inputName: String) {
 }
 
 fun main() {
-    val task = Day14("Day14")
+    val task = Day14("Day14", log = true)
     println(task.part1())
     println(task.part2())
 }
