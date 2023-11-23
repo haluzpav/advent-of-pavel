@@ -48,9 +48,9 @@ class Day19(inputName: String, private val log: Boolean = false) {
     }
 
     fun calcMaxGeodes(blueprint: Blueprint, minutes: Int, pruningSlope: Double): Int {
-        check(blueprint.robots.size == Resource.values().size)
-        check(blueprint.robots.zip(Resource.values()) { robot, resource -> robot.produces == resource }.all { it })
-        val zeroResources = List(Resource.values().size) { 0 }
+        check(blueprint.robots.size == Resource.entries.size)
+        check(blueprint.robots.zip(Resource.entries) { robot, resource -> robot.produces == resource }.all { it })
+        val zeroResources = List(Resource.entries.size) { 0 }
         val startNode = Node(
             robotCounts = List(blueprint.robots.size) { if (it == 0) 1 else 0 },
             resourceCounts = zeroResources,
@@ -60,12 +60,12 @@ class Day19(inputName: String, private val log: Boolean = false) {
         val nodeComparator: (Node, Node) -> Int = { p0, p1 ->
             // effectively make the Set based only on Node.resourceCounts and Node.robotCounts
             sequence {
-                for (i in Resource.values().indices) yield(p0.resourceCounts[i].compareTo(p1.resourceCounts[i]))
+                for (i in Resource.entries.indices) yield(p0.resourceCounts[i].compareTo(p1.resourceCounts[i]))
                 for (i in blueprint.robots.indices) yield(p0.robotCounts[i].compareTo(p1.robotCounts[i]))
             }.firstOrNull { it != 0 } ?: 0
         }
         var leafNodes = sortedSetOf<Node>(nodeComparator, startNode)
-        val maxResourcesForRobot = Resource.values().map { resource ->
+        val maxResourcesForRobot = Resource.entries.map { resource ->
             when (resource) {
                 Resource.Geode -> Int.MAX_VALUE
                 else -> blueprint.robots.maxOf { it.costs[resource.ordinal] }
@@ -103,7 +103,7 @@ class Day19(inputName: String, private val log: Boolean = false) {
                     listOf(null)
                 }
                 newLeafNodes += newActions.map { action ->
-                    val resourceCounts = Resource.values().mapIndexed { index, resource ->
+                    val resourceCounts = Resource.entries.mapIndexed { index, resource ->
                         val robot = blueprint.robots[index]
                         check(robot.produces == resource)
                         val newRobotCosts = if (action is FactoryAction.Build) action.robot.costs else zeroResources
@@ -140,9 +140,9 @@ class Day19(inputName: String, private val log: Boolean = false) {
         resourceCounts: List<Int>,
         robotCounts: List<Int>,
     ): Int {
-        val resourcesValue = Resource.values().mapIndexed { i, resource -> resource.value * resourceCounts[i] }.sum()
+        val resourcesValue = Resource.entries.mapIndexed { i, resource -> resource.value * resourceCounts[i] }.sum()
         val robotsValue = blueprint.robots.mapIndexed { i, robot ->
-            val robotCostValue = Resource.values().mapIndexed { j, resource -> resource.value * robot.costs[j] }.sum()
+            val robotCostValue = Resource.entries.mapIndexed { j, resource -> resource.value * robot.costs[j] }.sum()
             val robotPotentialResourcesValue = robot.produces.value * (minutes - minute)
             val robotIntrinsicValue = 5 + robot.produces.value
             val robotValue = robotCostValue + robotPotentialResourcesValue + robotIntrinsicValue
@@ -152,7 +152,7 @@ class Day19(inputName: String, private val log: Boolean = false) {
     }
 
     private fun haveEnoughQuantities(costs: List<Int>, stock: List<Int>): Boolean =
-        Resource.values().indices.all { stock[it] >= costs[it] }
+        Resource.entries.indices.all { stock[it] >= costs[it] }
 
     private data class Node(
         val robotCounts: List<Int>,

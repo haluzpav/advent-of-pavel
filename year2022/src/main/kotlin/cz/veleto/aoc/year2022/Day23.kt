@@ -43,14 +43,14 @@ class Day23(inputName: String, private val log: Boolean = false) {
 
     private fun moveElves(round: Int, elves: Set<Pos>): Set<Pos> {
         // first half
-        val directions = Direction.values().map { it.rotateBy(round - 1) }
+        val directions = Direction.entries.map { it.rotateBy(round - 1) }
         val proposedMoves = mutableMapOf<Pos, List<Pos>>() // proposed pos, to proposing elves
         val surroundedElves = mutableSetOf<Pos>()
         for (elf in elves) {
             val emptyDirections: List<Direction> = directions.filter { direction ->
                 direction.neighborFov.all { (elf + it) !in elves }
             }
-            if (emptyDirections.isEmpty() || emptyDirections.size == Direction.values().size) {
+            if (emptyDirections.isEmpty() || emptyDirections.size == Direction.entries.size) {
                 surroundedElves += elf
             } else {
                 val proposedMove = elf + emptyDirections.first().neighborFov[1]

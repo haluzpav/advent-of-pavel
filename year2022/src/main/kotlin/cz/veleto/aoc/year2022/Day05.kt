@@ -35,7 +35,7 @@ class Day05(inputName: String) {
         val count = input[height].split(' ').last().toInt()
         val stacks = List(count) { ArrayDeque<Char>(height) }
         input.take(height).forEach { s ->
-            s.chunked(4) { it[1].takeUnless { it == ' ' } }
+            s.chunked(4) { it[1].takeUnless { c -> c == ' ' } }
                 .forEachIndexed { index, c ->
                     if (c != null) stacks[index].addFirst(c)
                 }

@@ -66,7 +66,7 @@ class Day24(inputName: String, private val log: Boolean = false) {
             if (log) logState(node)
             val nextMinute = node.minute + 1
             if (!hasAnyWind(node.pos, nextMinute, winds)) nodes.addIfNotPresent(node.copy(minute = nextMinute))
-            for (direction in Direction.values()) {
+            for (direction in Direction.entries) {
                 val newPos = node.pos + getStepMove(direction)
                 when {
                     !newPos.isValid() || hasAnyWind(newPos, nextMinute, winds) -> continue
@@ -88,7 +88,7 @@ class Day24(inputName: String, private val log: Boolean = false) {
 
     private fun hasAnyWind(pos: Pos, minute: Int, winds: List<List<List<Boolean>>>): Boolean {
         val (x, y) = pos // x could be at entrances where there are no winds
-        return Direction.values().any { direction ->
+        return Direction.entries.any { direction ->
             val directionWinds = winds[direction.ordinal]
             val minuteShift = when (direction) {
                 Direction.Right, Direction.Down -> -minute
@@ -104,7 +104,7 @@ class Day24(inputName: String, private val log: Boolean = false) {
     /** @return wind direction, to list of currents, to winds in a current */
     private fun parseWinds(): List<List<List<Boolean>>> {
         val windDirections: MutableList<MutableList<MutableList<Boolean>>> =
-            MutableList(Direction.values().size) { mutableListOf() }
+            MutableList(Direction.entries.size) { mutableListOf() }
         for (line in input) {
             val width = line.length - 2
             if (line[1] == '.' && line[2] == '#') { // top wall

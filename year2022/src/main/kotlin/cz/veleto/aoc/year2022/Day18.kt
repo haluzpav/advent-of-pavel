@@ -53,7 +53,7 @@ class Day18(inputName: String) {
         }
     }
 
-    private fun demoteCandidatesBySpreadingAir(volume: Volume, cubes: List<Pos3>, candidates: List<Pos3>, ): List<Pos3> {
+    private fun demoteCandidatesBySpreadingAir(volume: Volume, cubes: List<Pos3>, candidates: List<Pos3>): List<Pos3> {
         var anyCandidateDemoted = true
         var keptCandidates = candidates
         while (anyCandidateDemoted) {
@@ -78,15 +78,14 @@ class Day18(inputName: String) {
         return keptCandidates
     }
 
-    @Suppress("ReplaceRangeToWithUntil")
     private fun raysFromPos(pos: Pos3, volume: Volume): Sequence<Sequence<Pos3>> {
         val (x, y, z) = pos
         return sequenceOf(
-            sequence { for (rx in (volume.xRange.first..x - 1).reversed()) yield(Pos3(rx, y, z)) },
+            sequence { for (rx in (volume.xRange.first..<x).reversed()) yield(Pos3(rx, y, z)) },
             sequence { for (rx in x + 1..volume.xRange.last) yield(Pos3(rx, y, z)) },
-            sequence { for (ry in (volume.yRange.first..y - 1).reversed()) yield(Pos3(x, ry, z)) },
+            sequence { for (ry in (volume.yRange.first..<y).reversed()) yield(Pos3(x, ry, z)) },
             sequence { for (ry in y + 1..volume.yRange.last) yield(Pos3(x, ry, z)) },
-            sequence { for (rz in (volume.zRange.first..z - 1).reversed()) yield(Pos3(x, y, rz)) },
+            sequence { for (rz in (volume.zRange.first..<z).reversed()) yield(Pos3(x, y, rz)) },
             sequence { for (rz in z + 1..volume.zRange.last) yield(Pos3(x, y, rz)) },
         )
     }

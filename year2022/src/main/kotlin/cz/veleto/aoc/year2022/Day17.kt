@@ -76,6 +76,7 @@ class Day17(inputName: String) {
         }
     }
 
+    @Suppress("unused")
     private fun printChamber(chamber: List<List<Char>>, onlyTop: Int? = null) {
         (0 until chamberWidth)
             .joinToString(separator = "", prefix = "⎡", postfix = "⎤") { "=" }

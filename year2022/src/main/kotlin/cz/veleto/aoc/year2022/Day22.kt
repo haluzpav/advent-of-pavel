@@ -133,9 +133,9 @@ class Day22(inputName: String) {
     }
 
     private fun findInnerCorners(grid: Set<Pos>): Set<Triple<Pos, Direction, Direction>> = buildSet {
-        val neighborMoves = Direction.values().map { getStepMove(it) }
-        val diagonalNeighborMoves = Direction.values()
-            .zip(Direction.values().map { it.rotateBy(1) })
+        val neighborMoves = Direction.entries.map { getStepMove(it) }
+        val diagonalNeighborMoves = Direction.entries
+            .zip(Direction.entries.map { it.rotateBy(1) })
             .map { (d1, d2) -> Triple(d1, d2, getStepMove(d1) + getStepMove(d2)) }
         for (pos in grid) {
             val emptyDiagonalNeighbor = diagonalNeighborMoves.singleOrNull { pos + it.third !in grid }
@@ -208,14 +208,8 @@ class Day22(inputName: String) {
 
     private sealed interface Instruction {
         data class Forward(val count: Int) : Instruction
-
-        object TurnLeft : Instruction {
-            override fun toString(): String = "TurnLeft"
-        }
-
-        object TurnRight : Instruction {
-            override fun toString(): String = "TurnRight"
-        }
+        data object TurnLeft : Instruction
+        data object TurnRight : Instruction
     }
 
     private enum class Direction {

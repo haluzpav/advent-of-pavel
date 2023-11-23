@@ -74,7 +74,7 @@ class Day12(inputName: String) {
     private fun explore(current: Node, neighbors: Sequence<Node>, nodesToHandle: MutableList<Node>) {
         val nextPathLength = current.currentShortestPath!! + 1
         neighbors
-            .filter { it.currentShortestPath?.let { it > nextPathLength } ?: true }
+            .filter { it.currentShortestPath?.let { pathLength -> pathLength > nextPathLength } ?: true }
             .forEach {
                 nodesToHandle.remove(it)
                 it.currentShortestPath = nextPathLength

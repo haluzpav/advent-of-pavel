@@ -11,7 +11,7 @@ class Day08(inputName: String) {
 
     fun part1(): Int {
         val visiblePoses = mutableSetOf<Pos>()
-        for (direction in Direction.values()) {
+        for (direction in Direction.entries) {
             val sideStepDirection = direction.rotateBy(-1)
             var rowStart: Pos? = when (direction) {
                 Direction.N -> treesInRow to treesInRow
@@ -42,7 +42,7 @@ class Day08(inputName: String) {
             for (by in 0..treesInRow) {
                 val b = bx to by
                 val bh = input[b]
-                val bv = Direction.values().map { direction ->
+                val bv = Direction.entries.map { direction ->
                     var c: Pos? = nextInDirection(direction, b)
                     var count = 0
                     while (c != null) {

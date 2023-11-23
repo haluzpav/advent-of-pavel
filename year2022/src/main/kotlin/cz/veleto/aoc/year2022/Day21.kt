@@ -6,19 +6,19 @@ class Day21(inputName: String) {
     private val input: Sequence<String> = readInput(inputName)
 
     companion object {
-        private const val rootMonkey = "root"
-        private const val humnMonkey = "humn"
+        private const val RootMonkey = "root"
+        private const val HumnMonkey = "humn"
     }
 
     fun part1(): Long {
         val monkeyYells = parseMonkeys().toMutableMap()
-        return yell(monkeyYells, rootMonkey, skipHumn = false)!!
+        return yell(monkeyYells, RootMonkey, skipHumn = false)!!
     }
 
     fun part2(): Long {
         val monkeyYells = parseMonkeys().toMutableMap()
-        yell(monkeyYells, rootMonkey, skipHumn = true)
-        val (number, monkeyCoveringHumn) = splitMonkeyToNumberAndMath(monkeyYells, rootMonkey)
+        yell(monkeyYells, RootMonkey, skipHumn = true)
+        val (number, monkeyCoveringHumn) = splitMonkeyToNumberAndMath(monkeyYells, RootMonkey)
         return digHumnOutOfMonkeys(monkeyYells, monkeyCoveringHumn, number)
     }
 
@@ -38,7 +38,7 @@ class Day21(inputName: String) {
     }.toMap()
 
     private fun yell(monkeyYells: MutableMap<String, MonkeyYell>, yellingMonkey: String, skipHumn: Boolean): Long? {
-        if (skipHumn && yellingMonkey == humnMonkey) return null
+        if (skipHumn && yellingMonkey == HumnMonkey) return null
         return when (val yell = monkeyYells[yellingMonkey]) {
             is MonkeyYell.Math -> {
                 val evaluatedMonkey1 = yell(monkeyYells, yell.monkey1, skipHumn)
@@ -68,7 +68,7 @@ class Day21(inputName: String) {
         val side1 = monkeyYells[monkey.monkey1]!!
         val side2 = monkeyYells[monkey.monkey2]!!
         return when {
-            monkey.monkey1 == humnMonkey || side1 is MonkeyYell.Math -> Triple((side2 as MonkeyYell.Number).number, monkey.monkey1, false)
+            monkey.monkey1 == HumnMonkey || side1 is MonkeyYell.Math -> Triple((side2 as MonkeyYell.Number).number, monkey.monkey1, false)
             side1 is MonkeyYell.Number -> Triple(side1.number, monkey.monkey2, true)
             else -> error("Can't split monkey $yellingMonkey")
         }
@@ -79,7 +79,7 @@ class Day21(inputName: String) {
         monkeyCoveringHumn: String,
         number: Long,
     ): Long {
-        if (monkeyCoveringHumn == humnMonkey) return number
+        if (monkeyCoveringHumn == HumnMonkey) return number
         val monkey = monkeyYells[monkeyCoveringHumn] as MonkeyYell.Math
         val (yellNumber, newCoveringMonkey, isNumberOnLeft) = splitMonkeyToNumberAndMath(monkeyYells, monkeyCoveringHumn)
         val newNumber = when (monkey.operation) {
