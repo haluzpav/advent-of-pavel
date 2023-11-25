@@ -2,7 +2,7 @@
 
 Project containing my implementation of [Advent of Code][aoc][^aoc].
 
-Written in plain Kotlin on JVM, using Gradle for build system, and JUnit for unit-tests.
+Written in plain Kotlin on JVM, using [Amper][amper] for build system, and JUnit for unit-tests.
 
 Each year is in separate `yearYYYY` module, with `core` module containing shared helper functions.
 
@@ -12,3 +12,4 @@ Each year is in separate `yearYYYY` module, with `core` module containing shared
     You can solve the puzzle and provide an answer using the language of your choice.
 
 [aoc]: https://adventofcode.com
+[amper]: https://github.com/JetBrains/amper
