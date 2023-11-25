@@ -3,10 +3,12 @@ rootProject.name = "Advent of Pavel"
 pluginManagement {
     repositories {
         mavenCentral()
+        google()
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/amper/amper")
     }
 }
 
-include("core")
-include("year2022")
-include("year2023")
+plugins {
+    id("org.jetbrains.amper.settings.plugin").version("0.1.0")
+}
