@@ -69,14 +69,14 @@ fun createInputFilePath(fileSuffix: String = ""): Path =
 
 fun Path.fetchInput(commandSuffix: String = "") {
     check(notExists()) { "Input file already exists" }
-    val process: Process = Runtime.getRuntime().exec("aocd $year $day $commandSuffix")
-    process.errorStream.copyTo(System.err)
-    process.waitFor()
-    if (process.exitValue() != 0) {
-        process.inputStream.copyTo(System.err)
+    val aocd: Process = Runtime.getRuntime().exec("aocd $year $day $commandSuffix")
+    aocd.errorStream.copyTo(System.err)
+    aocd.waitFor()
+    if (aocd.exitValue() != 0) {
+        aocd.inputStream.copyTo(System.err)
         error("AOCD failed")
     }
-    process.inputStream.copyTo(outputStream())
+    aocd.inputStream.copyTo(outputStream())
 }
 
 val exampleInputFile = createInputFilePath(fileSuffix = "_test")
@@ -88,9 +88,18 @@ exampleInputFile.fetchInput(commandSuffix = "-e")
 seriousInputFile.fetchInput()
 // endregion
 
+// region git add
+println("Adding files to git...")
+val createdFiles = listOf(srcFile, testFile, exampleInputFile, seriousInputFile)
+val git: Process = Runtime.getRuntime().exec(arrayOf("git", "add") + createdFiles.map(Path::toString).toTypedArray())
+git.errorStream.copyTo(System.err)
+git.waitFor()
+check(git.exitValue() == 0) { "Adding files to git failed" }
+// endregion
+
 // region report
 println("Created files:")
-listOf(srcFile, testFile, exampleInputFile, seriousInputFile).forEach { println("\t$it") }
+createdFiles.forEach { println("\t$it") }
 // endregion
 
 println("Have fun!")
