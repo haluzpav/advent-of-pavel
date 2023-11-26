@@ -5,6 +5,8 @@ import kotlin.io.path.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeText
 
+// https://pypi.org/project/advent-of-code-data/
+
 fun checkAocdExists() {
     val process = Runtime.getRuntime().exec("aocd --version")
     process.waitFor()
