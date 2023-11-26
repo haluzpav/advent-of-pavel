@@ -3,7 +3,7 @@
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.Path
-import kotlin.io.path.createDirectories
+import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
@@ -36,7 +36,7 @@ fun createKotlinFilePath(type: String, fileSuffix: String = ""): Path =
 val srcFile = createKotlinFilePath("src")
 val testFile = createKotlinFilePath("test", fileSuffix = "Test")
 
-listOf(srcFile, testFile).forEach { it.parent.createDirectories() }
+listOf(srcFile, testFile).forEach { it.createParentDirectories() }
 
 fun Path.createFile(text: String) {
     writeText(
@@ -85,7 +85,7 @@ fun Array<String>.awaitProcess(): Process = Runtime.getRuntime().exec(this).appl
 val exampleInputFile = createInputFilePath(fileSuffix = "_test")
 val seriousInputFile = createInputFilePath()
 
-listOf(exampleInputFile, seriousInputFile).forEach { it.parent.createDirectories() }
+listOf(exampleInputFile, seriousInputFile).forEach { it.createParentDirectories() }
 
 exampleInputFile.fetchInput(commandSuffix = "-e")
 seriousInputFile.fetchInput()
