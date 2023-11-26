@@ -67,16 +67,19 @@ println("Fetching input data...")
 fun createInputFilePath(fileSuffix: String = ""): Path =
     modulePath.resolve("inputs").resolve("Day$day$fileSuffix.txt")
 
-fun Path.fetchInput(commandSuffix: String = "") {
+fun Path.fetchInput(commandSuffix: String? = null) {
     check(notExists()) { "Input file already exists" }
-    val aocd: Process = Runtime.getRuntime().exec("aocd $year $day $commandSuffix")
-    aocd.errorStream.copyTo(System.err)
-    aocd.waitFor()
+    val aocd: Process = listOfNotNull("aocd", year, day, commandSuffix).toTypedArray().awaitProcess()
     if (aocd.exitValue() != 0) {
         aocd.inputStream.copyTo(System.err)
         error("AOCD failed")
     }
     aocd.inputStream.copyTo(outputStream())
+}
+
+fun Array<String>.awaitProcess(): Process = Runtime.getRuntime().exec(this).apply {
+    errorStream.copyTo(System.err)
+    waitFor()
 }
 
 val exampleInputFile = createInputFilePath(fileSuffix = "_test")
@@ -91,9 +94,7 @@ seriousInputFile.fetchInput()
 // region git add
 println("Adding files to git...")
 val createdFiles = listOf(srcFile, testFile, exampleInputFile, seriousInputFile)
-val git: Process = Runtime.getRuntime().exec(arrayOf("git", "add") + createdFiles.map(Path::toString).toTypedArray())
-git.errorStream.copyTo(System.err)
-git.waitFor()
+val git: Process = (arrayOf("git", "add") + createdFiles.map(Path::toString).toTypedArray()).awaitProcess()
 check(git.exitValue() == 0) { "Adding files to git failed" }
 // endregion
 
