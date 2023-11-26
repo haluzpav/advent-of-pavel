@@ -5,6 +5,7 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.isDirectory
+import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 
@@ -67,10 +68,15 @@ fun createInputFilePath(fileSuffix: String = ""): Path =
     modulePath.resolve("inputs").resolve("Day$day$fileSuffix.txt")
 
 fun Path.fetchInput(commandSuffix: String = "") {
-    val outputStream = outputStream(StandardOpenOption.CREATE_NEW)
+    check(notExists()) { "Input file already exists" }
     val process: Process = Runtime.getRuntime().exec("aocd $year $day $commandSuffix")
-    process.inputStream.copyTo(outputStream)
+    process.errorStream.copyTo(System.err)
     process.waitFor()
+    if (process.exitValue() != 0) {
+        process.inputStream.copyTo(System.err)
+        error("AOCD failed")
+    }
+    process.inputStream.copyTo(outputStream())
 }
 
 val exampleInputFile = createInputFilePath(fileSuffix = "_test")
