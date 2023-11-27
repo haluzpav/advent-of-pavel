@@ -28,9 +28,3 @@ class Day02(inputName: String) {
         return mCode + (rCode - 1) * 3
     }
 }
-
-fun main() {
-    val task = Day02("Day02")
-    println(task.part1())
-    println(task.part2())
-}

@@ -15,9 +15,3 @@ class Day06(inputName: String) {
             .let { it + count }
     }
 }
-
-fun main() {
-    val task = Day06("Day06")
-    println(task.part1())
-    println(task.part2())
-}

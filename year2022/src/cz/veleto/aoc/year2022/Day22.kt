@@ -216,9 +216,3 @@ class Day22(inputName: String) {
         Right, Down, Left, Up
     }
 }
-
-fun main() {
-    val task = Day22("Day22")
-    println(task.part1())
-    println(task.part2())
-}

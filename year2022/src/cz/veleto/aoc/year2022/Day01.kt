@@ -17,9 +17,3 @@ class Day01(inputName: String) {
         .takeLast(3)
         .sum()
 }
-
-fun main() {
-    val task = Day01("Day01")
-    println(task.part1())
-    println(task.part2())
-}

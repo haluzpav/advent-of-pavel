@@ -28,9 +28,3 @@ class Day04(inputName: String) {
     private fun <T : Comparable<T>> ClosedRange<T>.fullyIn(other: ClosedRange<T>): Boolean =
         start in other && endInclusive in other
 }
-
-fun main() {
-    val task = Day04("Day04")
-    println(task.part1())
-    println(task.part2())
-}

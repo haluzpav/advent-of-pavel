@@ -73,9 +73,3 @@ class Day08(inputName: String) {
         N, E, S, W
     }
 }
-
-fun main() {
-    val task = Day08("Day08")
-    println(task.part1())
-    println(task.part2())
-}

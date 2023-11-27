@@ -65,9 +65,3 @@ class Day15(inputName: String) {
         val distance: Int,
     )
 }
-
-fun main() {
-    val task = Day15("Day15")
-    println(task.part1(row = 2_000_000))
-    println(task.part2(max = 4_000_000))
-}

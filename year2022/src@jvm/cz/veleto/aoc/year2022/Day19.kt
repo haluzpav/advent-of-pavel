@@ -188,9 +188,3 @@ class Day19(inputName: String, private val log: Boolean = false) {
         Geode(8),
     }
 }
-
-fun main() {
-    val task = Day19("Day19", log = true)
-    println(task.part1())
-    println(task.part2())
-}

@@ -82,9 +82,3 @@ class Day23(inputName: String, private val log: Boolean = false) {
         East(listOf(-1 to 1, 0 to 1, 1 to 1)),
     }
 }
-
-fun main() {
-    val task = Day23("Day23", log = true)
-    println(task.part1())
-    println(task.part2())
-}

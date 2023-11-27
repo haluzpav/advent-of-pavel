@@ -90,9 +90,3 @@ class Day12(inputName: String) {
         var previousInPath: Node? = null,
     )
 }
-
-fun main() {
-    val task = Day12("Day12")
-    println(task.part1())
-    println(task.part2())
-}

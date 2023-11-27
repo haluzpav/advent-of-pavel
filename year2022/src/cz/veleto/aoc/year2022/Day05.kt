@@ -52,9 +52,3 @@ class Day05(inputName: String) {
     private fun getLastCrates(stacks: List<ArrayDeque<Char>>): String =
         stacks.map { it.last() }.joinToString(separator = "")
 }
-
-fun main() {
-    val task = Day05("Day05")
-    println(task.part1())
-    println(task.part2())
-}

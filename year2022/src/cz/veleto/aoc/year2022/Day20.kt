@@ -82,9 +82,3 @@ class Day20(inputName: String) {
         override fun toString(): String = "Node(value=$value, mixedCount=$mixedCount, nextNodeValue=${nextNode.value})"
     }
 }
-
-fun main() {
-    val task = Day20("Day20")
-    println(task.part1())
-    println(task.part2())
-}

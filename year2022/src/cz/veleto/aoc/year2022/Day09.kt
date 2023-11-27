@@ -3,8 +3,8 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.minus
 import cz.veleto.aoc.core.readInput
-import java.lang.Integer.max
 import kotlin.math.absoluteValue
+import kotlin.math.max
 import kotlin.math.sign
 
 class Day09(inputName: String) {
@@ -57,10 +57,4 @@ class Day09(inputName: String) {
             else -> error("wut ds")
         }
     }
-}
-
-fun main() {
-    val task = Day09("Day09")
-    println(task.part1())
-    println(task.part2())
 }

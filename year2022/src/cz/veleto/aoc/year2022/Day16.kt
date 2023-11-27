@@ -190,9 +190,3 @@ class Day16(inputName: String, private val log: Boolean = false) {
         val releasedPressure: Int,
     )
 }
-
-fun main() {
-    val task = Day16("Day16", log = true)
-    println(task.part1())
-    println(task.part2())
-}

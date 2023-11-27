@@ -1,6 +1,7 @@
 package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.readInput
+import kotlin.jvm.JvmInline
 import kotlin.math.min
 
 class Day13(inputName: String) {
@@ -118,10 +119,4 @@ class Day13(inputName: String) {
             override fun toString(): String = list.toString()
         }
     }
-}
-
-fun main() {
-    val task = Day13("Day13")
-    println(task.part1())
-    println(task.part2())
 }

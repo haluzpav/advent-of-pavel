@@ -113,9 +113,3 @@ class Day14(inputName: String, private val log: Boolean = false) {
         Air, Rock, Sand
     }
 }
-
-fun main() {
-    val task = Day14("Day14", log = true)
-    println(task.part1())
-    println(task.part2())
-}

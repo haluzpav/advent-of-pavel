@@ -73,9 +73,3 @@ class Day11(inputName: String) {
         val items: MutableList<Long>,
     )
 }
-
-fun main() {
-    val task = Day11("Day11")
-    println(task.part1())
-    println(task.part2())
-}

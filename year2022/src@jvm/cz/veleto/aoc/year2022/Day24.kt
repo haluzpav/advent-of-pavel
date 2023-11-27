@@ -151,9 +151,3 @@ class Day24(inputName: String, private val log: Boolean = false) {
         Forgotten, ReturningFor, ReturningWith
     }
 }
-
-fun main() {
-    val task = Day24("Day24", log = true)
-    println(task.part1())
-    println(task.part2())
-}

@@ -1,12 +1,23 @@
 package cz.veleto.aoc.core
 
-import java.io.File
+import okio.FileSystem
+import okio.Path.Companion.toPath
+import okio.buffer
+import okio.use
 
-@Suppress("FunctionName")
-private fun InputFile(name: String) = File("inputs", "$name.txt")
+internal expect val fileSystem: FileSystem
 
-fun loadInput(name: String): List<String> = InputFile(name).readLines()
+fun loadInput(name: String): List<String> = readInput(name).toList()
 
 fun readInput(name: String): Sequence<String> = sequence {
-    yieldAll(InputFile(name).bufferedReader().lineSequence())
+    val path = "inputs".toPath().resolve("$name.txt")
+        // in case of macosApp, we need to look for the file one dir above // TODO do somehow better
+        .let { if (!fileSystem.exists(it)) "..".toPath().resolve(it) else it }
+    fileSystem.source(path).use { source ->
+        source.buffer().use { bufferedSource ->
+            while (true) {
+                yield(bufferedSource.readUtf8Line() ?: break)
+            }
+        }
+    }
 }

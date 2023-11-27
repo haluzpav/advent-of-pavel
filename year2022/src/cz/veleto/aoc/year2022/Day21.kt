@@ -97,9 +97,3 @@ class Day21(inputName: String) {
         data class Math(val monkey1: String, val monkey2: String, val operation: Char) : MonkeyYell
     }
 }
-
-fun main() {
-    val task = Day21("Day21")
-    println(task.part1())
-    println(task.part2())
-}

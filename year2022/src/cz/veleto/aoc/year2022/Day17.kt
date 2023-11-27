@@ -151,9 +151,3 @@ class Day17(inputName: String) {
         }
     }
 }
-
-fun main() {
-    val task = Day17("Day17")
-    println(task.part1())
-    println(task.part2())
-}

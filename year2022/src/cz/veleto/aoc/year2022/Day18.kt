@@ -96,9 +96,3 @@ class Day18(inputName: String) {
         val zRange = cubes.minOf { it.third }..cubes.maxOf { it.third }
     }
 }
-
-fun main() {
-    val task = Day18("Day18")
-    println(task.part1())
-    println(task.part2())
-}

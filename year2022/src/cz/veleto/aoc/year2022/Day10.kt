@@ -32,9 +32,3 @@ class Day10(inputName: String) {
         .take(6)
         .reduce { acc, s -> acc + '\n' + s }
 }
-
-fun main() {
-    val task = Day10("Day10")
-    println(task.part1())
-    println(task.part2())
-}

@@ -33,9 +33,3 @@ class Day03(inputName: String) {
             else -> error("Unknown char $this")
         }
 }
-
-fun main() {
-    val task = Day03("Day03")
-    println(task.part1())
-    println(task.part2())
-}

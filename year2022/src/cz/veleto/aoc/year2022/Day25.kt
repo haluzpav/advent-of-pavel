@@ -50,8 +50,3 @@ class Day25(inputName: String) {
         .also { check(exp in 0..maxSnafuOrder) }
         .fold(1L) { acc, _ -> acc * this }
 }
-
-fun main() {
-    val task = Day25("Day25")
-    println(task.part1())
-}

@@ -95,9 +95,3 @@ class Day07(inputName: String) {
         ) : Node
     }
 }
-
-fun main() {
-    val task = Day07("Day07")
-    println(task.part1())
-    println(task.part2())
-}
