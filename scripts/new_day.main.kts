@@ -9,6 +9,8 @@ import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 
+// TODO also update createDayCommon somehow...
+
 println("New day, new elf adventure!")
 
 // region init
