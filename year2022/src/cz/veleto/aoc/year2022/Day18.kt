@@ -1,23 +1,22 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos3
 import cz.veleto.aoc.core.manhattanTo
-import cz.veleto.aoc.core.readInput
 
-class Day18(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
-    fun part1(): Int {
+class Day18(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val cubes = parseCubes()
-        return countExposedSides(cubes)
+        return countExposedSides(cubes).toString()
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         val cubes = parseCubes()
         val volume = Volume(cubes)
         val candidates = findPocketCandidates(volume, cubes)
         val pockets = demoteCandidatesBySpreadingAir(volume, cubes, candidates)
-        return countExposedSides(cubes + pockets)
+        return countExposedSides(cubes + pockets).toString()
     }
 
     private fun parseCubes(): List<Pos3> = input.map { line ->

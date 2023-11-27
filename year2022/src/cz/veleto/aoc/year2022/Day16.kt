@@ -1,13 +1,12 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 
-class Day16(inputName: String, private val log: Boolean = false) {
-    private val input: Sequence<String> = readInput(inputName)
-
+class Day16(config: Config) : AocDay(config) {
+    
     private val inputRegex = Regex("""^Valve ([A-Z]+) has flow rate=([0-9]+); tunnels? leads? to valves? (.+)$""")
 
-    fun part1(): Int {
+    override fun part1(): String {
         val valves = parseValves()
         val startValve = valves.first { it.name == "AA" }
         var paths = listOf(
@@ -18,7 +17,7 @@ class Day16(inputName: String, private val log: Boolean = false) {
         )
         val minutes = 30
         for (minute in 1..minutes) {
-            if (log) println("Minute $minute, considering ${paths.size} paths")
+            if (config.log) println("Minute $minute, considering ${paths.size} paths")
             paths = paths.flatMap { path ->
                 val openValves = path.actions.filterIsInstance<Action.OpenValve>().map { it.valve }
                 val newPressure = path.releasedPressure + openValves.sumOf { it.flow }
@@ -48,10 +47,10 @@ class Day16(inputName: String, private val log: Boolean = false) {
                 paths = paths.filter { it.releasedPressure > maxPressure / 2 }
             }
         }
-        return paths.maxOf { it.releasedPressure }
+        return paths.maxOf { it.releasedPressure }.toString()
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         val valves = parseValves()
         val startValve = valves.first { it.name == "AA" }
         var actionNodes = listOf(
@@ -63,7 +62,7 @@ class Day16(inputName: String, private val log: Boolean = false) {
         )
         val minutes = 26
         for (minute in 1..minutes) {
-            if (log) println("Minute $minute, considering ${actionNodes.size} nodes")
+            if (config.log) println("Minute $minute, considering ${actionNodes.size} nodes")
             actionNodes = actionNodes.flatMap { actionNodePair ->
                 val openValves: List<Valve> = buildList {
                     var n: ActionNode? = actionNodePair.me
@@ -121,10 +120,10 @@ class Day16(inputName: String, private val log: Boolean = false) {
                 val minPressureToPassCoef = (0.03 * minute + 0.35).coerceIn(0.0..0.82)
                 val minPressureToPass = maxPressure * minPressureToPassCoef
                 actionNodes = actionNodes.filter { it.releasedPressure > minPressureToPass }
-                if (log) println("\tpruned with coef $minPressureToPassCoef")
+                if (config.log) println("\tpruned with coef $minPressureToPassCoef")
             }
         }
-        return actionNodes.maxOf { it.releasedPressure }
+        return actionNodes.maxOf { it.releasedPressure }.toString()
     }
 
     private fun parseValves(): List<Valve> = input.map { line ->

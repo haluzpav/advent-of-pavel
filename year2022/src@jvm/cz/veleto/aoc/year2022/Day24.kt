@@ -1,22 +1,21 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.contains
 import cz.veleto.aoc.core.getWrapped
 import cz.veleto.aoc.core.manhattanTo
 import cz.veleto.aoc.core.plus
-import cz.veleto.aoc.core.readInput
 import cz.veleto.aoc.core.rotateBy
 import java.util.PriorityQueue
 
-class Day24(inputName: String, private val log: Boolean = false) {
-    private val input: Sequence<String> = readInput(inputName)
+class Day24(config: Config) : AocDay(config) {
 
-    fun part1(): Int = goThroughValley(SnacksState.Forgotten)
+    override fun part1(): String = goThroughValley(SnacksState.Forgotten)
 
-    fun part2(): Int = goThroughValley(SnacksState.ReturningWith)
+    override fun part2(): String = goThroughValley(SnacksState.ReturningWith)
 
-    private fun goThroughValley(targetSnacks: SnacksState): Int {
+    private fun goThroughValley(targetSnacks: SnacksState): String {
         val winds = parseWinds()
         val valleyRegionX = winds[Direction.Right.ordinal].indices
         val valleyRegionY = winds[Direction.Down.ordinal].indices
@@ -63,7 +62,7 @@ class Day24(inputName: String, private val log: Boolean = false) {
 
         while (nodes.isNotEmpty() && !nodes.peek().isAtEndWithSnacks()) {
             val node = nodes.poll()
-            if (log) logState(node)
+            if (config.log) logState(node)
             val nextMinute = node.minute + 1
             if (!hasAnyWind(node.pos, nextMinute, winds)) nodes.addIfNotPresent(node.copy(minute = nextMinute))
             for (direction in Direction.entries) {
@@ -81,9 +80,9 @@ class Day24(inputName: String, private val log: Boolean = false) {
             }
             exploredNodes++
         }
-        if (log) println("reached end after $exploredNodes nodes explored")
+        if (config.log) println("reached end after $exploredNodes nodes explored")
 
-        return nodes.peek().minute
+        return nodes.peek().minute.toString()
     }
 
     private fun hasAnyWind(pos: Pos, minute: Int, winds: List<List<List<Boolean>>>): Boolean {

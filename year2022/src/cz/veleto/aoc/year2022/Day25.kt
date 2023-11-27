@@ -1,11 +1,10 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 import kotlin.math.abs
 
-class Day25(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
+class Day25(config: Config) : AocDay(config) {
+    
     private val snafus = listOf(-2, -1, 0, 1, 2)
     private val maxSnafuOrder = 27 // so 2*5^maxSnafuOrder < Long.MAX_VALUE
     private val snafuPowers: List<Long> = (0..maxSnafuOrder).map { 5.pow(it) }
@@ -13,10 +12,12 @@ class Day25(inputName: String) {
         .runningFold(0L) { acc, power -> acc + power * 2 }
         .drop(1)
 
-    fun part1(): String = input
+    override fun part1(): String = input
         .map(::snafuToDec)
         .sum()
         .let(::decToSnafu)
+
+    override fun part2(): String = ""
 
     private fun snafuToDec(snafu: String): Long = snafu.toList().asReversed()
         .map { c ->

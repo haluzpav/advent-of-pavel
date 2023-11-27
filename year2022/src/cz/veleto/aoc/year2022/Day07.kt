@@ -1,18 +1,17 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.AocDay
 
-class Day07(inputName: String) {
-    private val input: List<String> = loadInput(inputName)
-
-    fun part1(): Long {
+class Day07(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val graph = parseIntoGraph()
         calculateDirSizes(graph)
         val atMost100kDirs = findAtMost100kDirs(graph)
-        return atMost100kDirs.sumOf { it.childrenSize!! }
+        return atMost100kDirs.sumOf { it.childrenSize!! }.toString()
     }
 
-    fun part2(): Long {
+    override fun part2(): String {
         val maxSpace = 70000000
         val minNeeded = 30000000
         val graph = parseIntoGraph()
@@ -21,21 +20,21 @@ class Day07(inputName: String) {
         val toDeleteAtLeast = minNeeded - nowAvailable
         check(toDeleteAtLeast > 0)
         val deletionCandidates = findAtLeastDirs(graph, toDeleteAtLeast)
-        return deletionCandidates.minOf { it.childrenSize!! }
+        return deletionCandidates.minOf { it.childrenSize!! }.toString()
     }
 
     private fun parseIntoGraph(): Node.Directory {
-        check(input[0] == """$ cd /""")
+        check(cachedInput[0] == """$ cd /""")
         val root = Node.Directory("/")
         parseChildren(root, indexToContinueFrom = 1)
         return root
     }
 
     private fun parseChildren(directory: Node.Directory, indexToContinueFrom: Int): Int {
-        check(input[indexToContinueFrom] == """$ ls""")
+        check(cachedInput[indexToContinueFrom] == """$ ls""")
         var i = indexToContinueFrom + 1
-        while (i < input.size) {
-            val line = input[i]
+        while (i < cachedInput.size) {
+            val line = cachedInput[i]
             when {
                 line == """$ cd ..""" -> return (i - indexToContinueFrom + 1)
                 line.startsWith("""$ cd""") -> {

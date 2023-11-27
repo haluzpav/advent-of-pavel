@@ -7,8 +7,6 @@ import okio.use
 
 internal expect val fileSystem: FileSystem
 
-fun loadInput(name: String): List<String> = readInput(name).toList()
-
 fun readInput(name: String): Sequence<String> = sequence {
     val path = "inputs".toPath().resolve("$name.txt")
         // in case of macosApp, we need to look for the file one dir above // TODO do somehow better

@@ -1,11 +1,10 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.plus
-import cz.veleto.aoc.core.readInput
 
-class Day17(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
+class Day17(config: Config) : AocDay(config) {
     private val baseRocks = listOf(
         Rock(
             shape = '-',
@@ -30,16 +29,16 @@ class Day17(inputName: String) {
     )
     private val chamberWidth = 7
 
-    fun part1(): Int {
+    override fun part1(): String {
         val totalRocks = 2_022
         val jetMoves: List<Int> = parseJetMoves()
         val chamber: MutableList<MutableList<Char>> = mutableListOf()
         val engine = RockFallingEngine(baseRocks, jetMoves, chamber, chamberWidth)
         while (engine.stoppedRockCount < totalRocks) engine.letItFall()
-        return chamber.size
+        return chamber.size.toString()
     }
 
-    fun part2(): Long {
+    override fun part2(): String {
         val totalRocks = 1_000_000_000_000
         val jetMoves: List<Int> = parseJetMoves()
         val chamber: MutableList<MutableList<Char>> = mutableListOf()
@@ -65,7 +64,7 @@ class Day17(inputName: String) {
         engine.stoppedRockCount = 0
         while (engine.stoppedRockCount < rockCountToTopUp) engine.letItFall()
 
-        return chamber.size + periodHeight * skippablePeriodCount
+        return (chamber.size + periodHeight * skippablePeriodCount).toString()
     }
 
     private fun parseJetMoves(): List<Int> = input.single().map { jet ->

@@ -1,25 +1,24 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 
-class Day21(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
+class Day21(config: Config) : AocDay(config) {
+    
     companion object {
         private const val RootMonkey = "root"
         private const val HumnMonkey = "humn"
     }
 
-    fun part1(): Long {
+    override fun part1(): String {
         val monkeyYells = parseMonkeys().toMutableMap()
-        return yell(monkeyYells, RootMonkey, skipHumn = false)!!
+        return yell(monkeyYells, RootMonkey, skipHumn = false)!!.toString()
     }
 
-    fun part2(): Long {
+    override fun part2(): String {
         val monkeyYells = parseMonkeys().toMutableMap()
         yell(monkeyYells, RootMonkey, skipHumn = true)
         val (number, monkeyCoveringHumn) = splitMonkeyToNumberAndMath(monkeyYells, RootMonkey)
-        return digHumnOutOfMonkeys(monkeyYells, monkeyCoveringHumn, number)
+        return digHumnOutOfMonkeys(monkeyYells, monkeyCoveringHumn, number).toString()
     }
 
     private fun parseMonkeys(): Map<String, MonkeyYell> = input.map { line ->

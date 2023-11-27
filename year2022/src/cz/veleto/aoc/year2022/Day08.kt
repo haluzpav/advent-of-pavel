@@ -1,15 +1,14 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.get
-import cz.veleto.aoc.core.loadInput
 import cz.veleto.aoc.core.rotateBy
 
-class Day08(inputName: String) {
-    private val input: List<String> = loadInput(inputName)
-    private val treesInRow: Int = input.lastIndex
+class Day08(config: Config) : AocDay(config) {
+    private val treesInRow: Int = cachedInput.lastIndex
 
-    fun part1(): Int {
+    override fun part1(): String {
         val visiblePoses = mutableSetOf<Pos>()
         for (direction in Direction.entries) {
             val sideStepDirection = direction.rotateBy(-1)
@@ -23,7 +22,7 @@ class Day08(inputName: String) {
                 var pos: Pos? = rowStart
                 var m = Char.MIN_VALUE
                 while (pos != null) {
-                    val h = input[pos]
+                    val h = cachedInput[pos]
                     if (h > m) {
                         visiblePoses += pos
                         m = h
@@ -33,20 +32,20 @@ class Day08(inputName: String) {
                 rowStart = nextInDirection(sideStepDirection, rowStart)
             }
         }
-        return visiblePoses.count()
+        return visiblePoses.count().toString()
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         var mv = Int.MIN_VALUE
         for (bx in 0..treesInRow) {
             for (by in 0..treesInRow) {
                 val b = bx to by
-                val bh = input[b]
+                val bh = cachedInput[b]
                 val bv = Direction.entries.map { direction ->
                     var c: Pos? = nextInDirection(direction, b)
                     var count = 0
                     while (c != null) {
-                        val ch = input[c]
+                        val ch = cachedInput[c]
                         count++
                         if (ch >= bh) break
                         c = nextInDirection(direction, c)
@@ -56,7 +55,7 @@ class Day08(inputName: String) {
                 if (bv > mv) mv = bv
             }
         }
-        return mv
+        return mv.toString()
     }
 
     private fun nextInDirection(direction: Direction, current: Pos): Pos? {

@@ -1,13 +1,12 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.AocDay
 
-class Day02(inputName: String) {
-    private val input: List<String> = loadInput(inputName)
+class Day02(config: Config) : AocDay(config) {
 
-    fun part1(): Int = input.sumOf { calcScore1(it[0], it[2]) }
+    override fun part1(): String = input.sumOf { calcScore1(it[0], it[2]) }.toString()
 
-    fun part2(): Int = input.sumOf { calcScore2(it[0], it[2]) }
+    override fun part2(): String = input.sumOf { calcScore2(it[0], it[2]) }.toString()
 
     private fun calcScore1(o: Char, m: Char): Int {
         val oCode = o.code - 64

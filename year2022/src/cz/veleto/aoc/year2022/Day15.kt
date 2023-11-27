@@ -1,17 +1,17 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.manhattanTo
-import cz.veleto.aoc.core.readInput
 import kotlin.math.abs
 
-class Day15(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
+class Day15(config: Config) : AocDay(config) {
 
     private val inputLineRegex = Regex("""^.*x=(-?[0-9]+), y=(-?[0-9]+).+x=(-?[0-9]+), y=(-?[0-9]+).*$""")
 
-    fun part1(row: Int): Int = parseSensors()
+    override fun part1(): String = parseSensors()
         .map { sensor ->
+            val row = config.year2022day15part1row
             val (x, y) = sensor.pos
             val (bx, by) = sensor.closestBeacon
             val dToRow = abs(row - y)
@@ -21,8 +21,10 @@ class Day15(inputName: String) {
         }
         .reduce { acc, longs -> acc.union(longs) }
         .count()
+        .toString()
 
-    fun part2(max: Int): Long {
+    override fun part2(): String {
+        val max = config.year2022day15part2max
         val sensors = parseSensors().toList()
         return sensors
             .flatMap { sensor ->
@@ -44,6 +46,7 @@ class Day15(inputName: String) {
             .toSet()
             .single()
             .let { (x, y) -> x * 4_000_000L + y }
+            .toString()
     }
 
     private fun parseSensors(): Sequence<Sensor> = input

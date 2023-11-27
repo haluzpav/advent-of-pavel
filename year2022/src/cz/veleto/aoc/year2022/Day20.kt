@@ -1,21 +1,20 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 
-class Day20(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
-    fun part1(): Long {
+class Day20(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val list = parseList().toList()
         val mixedList = mix(list, rounds = 1)
-        return getGroveCoors(mixedList)
+        return getGroveCoors(mixedList).toString()
     }
 
-    fun part2(): Long {
+    override fun part2(): String {
         val list = parseList()
         val decryptedList = list.map { it * 811_589_153 }.toList()
         val mixedList = mix(decryptedList, rounds = 10)
-        return getGroveCoors(mixedList)
+        return getGroveCoors(mixedList).toString()
     }
 
     private fun parseList(): Sequence<Long> = input.map { it.toLong() }

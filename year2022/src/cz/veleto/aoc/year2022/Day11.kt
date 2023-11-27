@@ -1,17 +1,16 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.component6
-import cz.veleto.aoc.core.readInput
 
-class Day11(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
-    fun part1(): Long {
+class Day11(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val monkeys = parseMonkeys()
         return simulate(monkeys, rounds = 20) { it / 3 }
     }
 
-    fun part2(): Long {
+    override fun part2(): String {
         val monkeys = parseMonkeys()
         val mod = monkeys.map { it.testDivisor }.reduce { acc, i -> acc * i }
         return simulate(monkeys, rounds = 10_000) { it.rem(mod) }
@@ -40,7 +39,7 @@ class Day11(inputName: String) {
         }
         .toList()
 
-    private fun simulate(monkeys: List<Monkey>, rounds: Int, boredom: (Long) -> Long): Long {
+    private fun simulate(monkeys: List<Monkey>, rounds: Int, boredom: (Long) -> Long): String {
         val inspectsCount = monkeys.associate { it.id to 0 }.toMutableMap()
         for (round in 1..rounds) {
             for (monkey in monkeys) {
@@ -62,6 +61,7 @@ class Day11(inputName: String) {
             .sortedDescending()
             .take(2)
             .fold(1L) { acc, i -> acc * i }
+            .toString()
     }
 
     data class Monkey(

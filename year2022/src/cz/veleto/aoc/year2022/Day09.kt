@@ -1,18 +1,17 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.minus
-import cz.veleto.aoc.core.readInput
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.sign
 
-class Day09(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
+class Day09(config: Config) : AocDay(config) {
+    
+    override fun part1(): String = countTailPositions(ropeLength = 2).toString()
 
-    fun part1(): Int = countTailPositions(ropeLength = 2)
-
-    fun part2(): Int = countTailPositions(ropeLength = 10)
+    override fun part2(): String = countTailPositions(ropeLength = 10).toString()
 
     private fun countTailPositions(ropeLength: Int): Int {
         val rope = MutableList(ropeLength) { 0 to 0 }

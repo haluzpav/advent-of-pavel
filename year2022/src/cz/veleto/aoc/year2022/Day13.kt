@@ -1,25 +1,24 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 import kotlin.jvm.JvmInline
 import kotlin.math.min
 
-class Day13(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
-    fun part1(): Int = input.chunked(3)
+class Day13(config: Config) : AocDay(config) {
+    
+    override fun part1(): String = input.chunked(3)
         .mapIndexed { pairIndex, (leftString, rightString) ->
             val left = parseList(leftString)
             val right = parseList(rightString)
             alignLists(left, right)
             val isInRightOrder = compareLists(left, right)
             if (isInRightOrder) pairIndex + 1 else 0
-        }.sum()
+        }.sum().toString()
 
-    fun part2(): Int {
+    override fun part2(): String {
         val indexOf2 = countBefore("""[[2]]""") + 1
         val indexOf6 = countBefore("""[[6]]""") + 2
-        return indexOf2 * indexOf6
+        return (indexOf2 * indexOf6).toString()
     }
 
     private fun parseList(string: String): Element.List {

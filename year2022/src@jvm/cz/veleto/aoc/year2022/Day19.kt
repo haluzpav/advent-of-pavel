@@ -1,10 +1,9 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 
-class Day19(inputName: String, private val log: Boolean = false) {
-    private val input: Sequence<String> = readInput(inputName)
-
+class Day19(config: Config) : AocDay(config) {
+    
     private val inputRegex = Regex(
         """
             ^Blueprint ([0-9]+):
@@ -15,12 +14,14 @@ class Day19(inputName: String, private val log: Boolean = false) {
         """.trimIndent().replace("\n", " ")
     )
 
-    fun part1(): Int = parseBlueprints()
+    override fun part1(): String = parseBlueprints()
         .sumOf { it.id * calcMaxGeodes(it, minutes = 24, pruningSlope = 0.5) }
+        .toString()
 
-    fun part2(): Int = parseBlueprints()
+    override fun part2(): String = parseBlueprints()
         .take(3)
         .fold(1) { acc, blueprint -> acc * calcMaxGeodes(blueprint, minutes = 32, pruningSlope = 1.4) }
+        .toString()
 
     fun parseBlueprints(): Sequence<Blueprint> = input.map { line ->
         val ints = inputRegex.matchEntire(line)!!.groupValues.drop(1).map { it.toInt() }
@@ -81,7 +82,7 @@ class Day19(inputName: String, private val log: Boolean = false) {
                 "leaf nodes ${leafNodes.size}",
                 "lastMinuteMaxPerformance $maxPerformance",
                 "minPerformanceCoefficient %.2f".format(minPerformanceCoefficient),
-            ).joinToString().also { if (log) println(it) }
+            ).joinToString().also { if (config.log) println(it) }
 
             val newLeafNodes = sortedSetOf<Node>(nodeComparator)
             for (node in leafNodes) {
@@ -129,7 +130,7 @@ class Day19(inputName: String, private val log: Boolean = false) {
             }
             leafNodes = newLeafNodes
         }
-        if (log) println("totalPruned $totalPruned")
+        if (config.log) println("totalPruned $totalPruned")
         return leafNodes.maxOf { it.resourceCounts[3] }
     }
 

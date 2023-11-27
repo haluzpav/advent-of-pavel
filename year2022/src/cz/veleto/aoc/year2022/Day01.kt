@@ -1,19 +1,22 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.splitBy
 
-class Day01(inputName: String) {
-    private val input: List<String> = loadInput(inputName)
+class Day01(config: Config) : AocDay(config) {
 
-    fun part1(): Int = input
+    override fun part1(): String = input
+        .toList()
         .splitBy(predicate = { it == "" }, mapElement = { it.toInt() })
         .maxOf { it.sum() }
+        .toString()
 
-    fun part2(): Int = input
+    override fun part2(): String = input
+        .toList()
         .splitBy(predicate = { it == "" }, mapElement = { it.toInt() })
         .map { it.sum() }
         .sorted()
         .takeLast(3)
         .sum()
+        .toString()
 }

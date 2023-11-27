@@ -1,23 +1,22 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.plus
-import cz.veleto.aoc.core.readInput
 import cz.veleto.aoc.core.rotateBy
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class Day22(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
-    fun part1(): Int {
+class Day22(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val (tiles, walls, instructions) = parseInput()
         return followInstructions(tiles, walls, instructions) { pos, direction ->
             findWrapAroundPos(tiles, walls, pos, direction) to direction
         }
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         val (tiles, walls, instructions) = parseInput()
         val grid = tiles + walls
         val innerGridCorners = findInnerCorners(grid)
@@ -78,7 +77,7 @@ class Day22(inputName: String) {
         walls: Set<Pos>,
         instructions: List<Instruction>,
         travelThroughEdge: (Pos, Direction) -> Pair<Pos, Direction>,
-    ): Int {
+    ): String {
         var pos = tiles.first()
         var direction = Direction.Right
         for (instruction in instructions) {
@@ -105,7 +104,7 @@ class Day22(inputName: String) {
             }
         }
         val (x, y) = pos
-        return 1_000 * (x + 1) + 4 * (y + 1) + direction.ordinal
+        return (1_000 * (x + 1) + 4 * (y + 1) + direction.ordinal).toString()
     }
 
     private fun updateDirection(current: Direction, instruction: Instruction): Direction = when (instruction) {

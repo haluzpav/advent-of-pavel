@@ -1,11 +1,10 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.readInput
+import cz.veleto.aoc.core.AocDay
 import kotlin.math.abs
 
-class Day10(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
+class Day10(config: Config) : AocDay(config) {
+    
     private val xReg: Sequence<Int> = input
         .flatMap {
             val parts = it.split(" ")
@@ -17,12 +16,13 @@ class Day10(inputName: String) {
         }
         .runningFold(1) { acc, i -> i?.let { acc + it } ?: acc }
 
-    fun part1(): Int = xReg
+    override fun part1(): String = xReg
         .mapIndexed { index, i -> index to i }
         .filter { (index, _) -> (index + 1 - 20).rem(40) == 0 }
         .sumOf { (index, i) -> i * (index + 1) }
+        .toString()
 
-    fun part2(): String = xReg
+    override fun part2(): String = xReg
         .mapIndexed { index, spritePos ->
             val cyclePos = index.rem(40)
             if (abs(cyclePos - spritePos) <= 1) '█' else ' '

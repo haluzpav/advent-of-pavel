@@ -1,17 +1,18 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.AocDay
 
-class Day04(inputName: String) {
-    private val input: List<String> = loadInput(inputName)
-
-    fun part1(): Int = input
+class Day04(config: Config) : AocDay(config) {
+    
+    override fun part1(): String = input
         .map(::parseRanges)
         .count { (a, b) -> a.fullyIn(b) || b.fullyIn(a) }
+        .toString()
 
-    fun part2(): Int = input
+    override fun part2(): String = input
         .map(::parseRanges)
         .count { (a, b) -> b.first in a || a.first in b }
+        .toString()
 
     private fun parseRanges(s: String): Pair<UIntRange, UIntRange> = s
         .split(',')

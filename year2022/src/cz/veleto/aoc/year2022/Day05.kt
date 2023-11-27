@@ -1,13 +1,12 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.loadInput
+import cz.veleto.aoc.core.AocDay
 
-class Day05(inputName: String) {
-    private val input: List<String> = loadInput(inputName)
-
-    fun part1(): String {
+class Day05(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val stacks = parseStacks()
-        input.dropWhile { !it.startsWith("move") }
+        cachedInput.dropWhile { !it.startsWith("move") }
             .forEach { line ->
                 val (count, from, to) = parseMoveLine(line)
                 repeat(count) {
@@ -18,9 +17,9 @@ class Day05(inputName: String) {
         return getLastCrates(stacks)
     }
 
-    fun part2(): String {
+    override fun part2(): String {
         val stacks = parseStacks()
-        input.dropWhile { !it.startsWith("move") }
+        cachedInput.dropWhile { !it.startsWith("move") }
             .forEach { line ->
                 val (count, from, to) = parseMoveLine(line)
                 val toRemove = stacks[from].takeLast(count)
@@ -31,10 +30,10 @@ class Day05(inputName: String) {
     }
 
     private fun parseStacks(): List<ArrayDeque<Char>> {
-        val height = input.indexOfFirst { it.startsWith(" 1") }
-        val count = input[height].split(' ').last().toInt()
+        val height = cachedInput.indexOfFirst { it.startsWith(" 1") }
+        val count = cachedInput[height].trim().split(' ').last().toInt()
         val stacks = List(count) { ArrayDeque<Char>(height) }
-        input.take(height).forEach { s ->
+        cachedInput.take(height).forEach { s ->
             s.chunked(4) { it[1].takeUnless { c -> c == ' ' } }
                 .forEachIndexed { index, c ->
                     if (c != null) stacks[index].addFirst(c)

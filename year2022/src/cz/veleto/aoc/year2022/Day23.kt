@@ -1,14 +1,13 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.plus
-import cz.veleto.aoc.core.readInput
 import cz.veleto.aoc.core.rotateBy
 
-class Day23(inputName: String, private val log: Boolean = false) {
-    private val input: Sequence<String> = readInput(inputName)
+class Day23(config: Config) : AocDay(config) {
 
-    fun part1(): Int {
+    override fun part1(): String {
         var elves = parseElves()
         for (round in 1..10) {
             elves = moveElves(round, elves)
@@ -18,10 +17,10 @@ class Day23(inputName: String, private val log: Boolean = false) {
         val minY = elves.minOf { (_, y) -> y }
         val maxY = elves.maxOf { (_, y) -> y }
         val rectSize = (maxX - minX + 1) * (maxY - minY + 1)
-        return rectSize - elves.size
+        return (rectSize - elves.size).toString()
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         var elves = parseElves()
         var round = 0
         var anyElvesMoved = true
@@ -29,10 +28,10 @@ class Day23(inputName: String, private val log: Boolean = false) {
             round++
             val newElves = moveElves(round, elves)
             anyElvesMoved = newElves != elves
-            if (log) println("Round $round, movedElves ${(newElves - elves).size}")
+            if (config.log) println("Round $round, movedElves ${(newElves - elves).size}")
             elves = newElves
         }
-        return round
+        return round.toString()
     }
 
     private fun parseElves(): Set<Pair<Int, Int>> = input.flatMapIndexed { x: Int, line: String ->

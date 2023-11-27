@@ -1,12 +1,11 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
-import cz.veleto.aoc.core.readInput
 
-class Day12(inputName: String) {
-    private val input: Sequence<String> = readInput(inputName)
-
-    fun part1(): Int {
+class Day12(config: Config) : AocDay(config) {
+    
+    override fun part1(): String {
         val (nodes, start, end) = parseNodes()
         start.currentShortestPath = 0
         val nodesToHandle = mutableListOf(start)
@@ -17,16 +16,16 @@ class Day12(inputName: String) {
                 .filter { it.height - node.height <= 1 }
             explore(node, neighbors, nodesToHandle)
         }
-        return end.currentShortestPath!!
+        return end.currentShortestPath!!.toString()
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         val (nodes, _, end) = parseNodes()
         end.currentShortestPath = 0
         val nodesToHandle = mutableListOf(end)
         while (nodesToHandle.isNotEmpty()) {
             val node = nodesToHandle.removeFirst()
-            if (node.height == 'a') return node.currentShortestPath!!
+            if (node.height == 'a') return node.currentShortestPath!!.toString()
             val neighbors = findNeighbors(nodes, node)
                 .filter { node.height - it.height <= 1 }
             explore(node, neighbors, nodesToHandle)

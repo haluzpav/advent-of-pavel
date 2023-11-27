@@ -1,18 +1,17 @@
 package cz.veleto.aoc.year2022
 
+import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
-import cz.veleto.aoc.core.readInput
 import kotlin.math.max
 import kotlin.math.min
 
-class Day14(inputName: String, private val log: Boolean = false) {
-    private val input: Sequence<String> = readInput(inputName)
-
+class Day14(config: Config) : AocDay(config) {
+    
     private val xShift = -300
     private val maxX = 700
     private val maxXShifted = maxX + xShift
 
-    fun part1(): Int {
+    override fun part1(): String {
         val grid = parseInput()
         var lastSandPos: Pos? = null
         var sandCount = 0
@@ -27,11 +26,11 @@ class Day14(inputName: String, private val log: Boolean = false) {
                 lastSandPos = letSandFall(grid, lastSandPos)
             }
         }
-        if (log) printGrid(grid)
-        return sandCount - 1
+        if (config.log) printGrid(grid)
+        return (sandCount - 1).toString()
     }
 
-    fun part2(): Int {
+    override fun part2(): String {
         val grid = parseInput()
         addFloor(grid)
         var lastSandPos: Pos? = null
@@ -48,8 +47,8 @@ class Day14(inputName: String, private val log: Boolean = false) {
                 lastSandPos = letSandFall(grid, lastSandPos)
             }
         }
-        if (log) printGrid(grid)
-        return sandCount
+        if (config.log) printGrid(grid)
+        return sandCount.toString()
     }
 
     private fun parseInput(): MutableList<MutableList<Block>> {
