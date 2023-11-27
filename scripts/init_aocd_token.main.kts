@@ -7,14 +7,12 @@ import kotlin.io.path.writeText
 
 // https://pypi.org/project/advent-of-code-data/
 
-fun checkAocdExists() {
+fun checkAocdWorks() {
     val process = Runtime.getRuntime().exec("aocd --version")
     process.waitFor()
     process.errorStream.copyTo(System.err)
     check(process.exitValue() == 0) { "AOCD not available?!" }
 }
-
-checkAocdExists()
 
 require(args.size == 1) { "Expecting token as single arg" }
 val token = args[0]
@@ -25,3 +23,5 @@ val aocdTokenFile: Path = homeDirectory.resolve(".config").resolve("aocd").resol
 aocdTokenFile.createParentDirectories()
 
 aocdTokenFile.writeText(token)
+
+checkAocdWorks()
