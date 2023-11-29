@@ -8,9 +8,9 @@ import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
+import kotlin.io.path.readLines
+import kotlin.io.path.writeLines
 import kotlin.io.path.writeText
-
-// TODO also update createDayCommon somehow...
 
 fun String.isPositiveInt(): Boolean = toIntOrNull().let { it != null && it > 0 }
 
@@ -96,13 +96,15 @@ fun Path.createFile(text: String) {
     )
 }
 
+val basePackagePath = Path("cz", "veleto", "aoc")
+
 fun createKotlinFiles(
     modulePath: Path,
     year: String,
     day: String,
     answers: List<Pair<String?, String?>>,
 ): List<Path> {
-    val packagePath = Path("cz", "veleto", "aoc", "year$year")
+    val packagePath = basePackagePath.resolve("year$year")
 
     fun createKotlinFilePath(type: String, fileSuffix: String = ""): Path =
         modulePath.resolve(type).resolve(packagePath).resolve("Day$day$fileSuffix.kt")
@@ -176,6 +178,17 @@ fun addFilesToGit(filePaths: List<Path>) {
     check(git.exitValue() == 0) { "Adding files to git failed" }
 }
 
+fun addImplementationToBuilder(modulePath: Path, year: String, day: String) {
+    val path = modulePath.resolve("src").resolve(basePackagePath).resolve("year$year").resolve("CreateDayCommon.kt")
+    val lines = path.readLines()
+    val elseCaseIndex = lines.indexOfFirst { "else ->" in it }
+    val newLines = lines.toMutableList().apply {
+        val newLine = """${day.toInt()} -> Day$day(baseSeriousConfig.copy(inputName = "Day$day"))"""
+        add(elseCaseIndex, newLine.prependIndent())
+    }
+    path.writeLines(newLines)
+}
+
 fun main() {
     println("New day, new elf adventure!")
 
@@ -194,6 +207,9 @@ fun main() {
 
     println("Adding files to git...")
     addFilesToGit(createdFiles)
+
+    println("Adding implementation to the builder...")
+    addImplementationToBuilder(modulePath, year, day)
 
     println("Created files:")
     createdFiles.forEach { println("\t$it") }
