@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import kotlin.math.abs
 
 class Day10(config: Config) : AocDay(config) {
-    
+
     private val xReg: Sequence<Int> = input
         .flatMap {
             val parts = it.split(" ")

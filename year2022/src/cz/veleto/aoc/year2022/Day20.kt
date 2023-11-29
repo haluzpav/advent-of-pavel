@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 
 class Day20(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String {
         val list = parseList().toList()
         val mixedList = mix(list, rounds = 1)

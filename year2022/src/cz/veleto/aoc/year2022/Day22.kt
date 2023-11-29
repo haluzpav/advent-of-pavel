@@ -8,7 +8,7 @@ import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 class Day22(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String {
         val (tiles, walls, instructions) = parseInput()
         return followInstructions(tiles, walls, instructions) { pos, direction ->

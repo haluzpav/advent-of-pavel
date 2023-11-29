@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.Pos3
 import cz.veleto.aoc.core.manhattanTo
 
 class Day18(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String {
         val cubes = parseCubes()
         return countExposedSides(cubes).toString()

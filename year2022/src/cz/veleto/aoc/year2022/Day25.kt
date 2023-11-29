@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import kotlin.math.abs
 
 class Day25(config: Config) : AocDay(config) {
-    
+
     private val snafus = listOf(-2, -1, 0, 1, 2)
     private val maxSnafuOrder = 27 // so 2*5^maxSnafuOrder < Long.MAX_VALUE
     private val snafuPowers: List<Long> = (0..maxSnafuOrder).map { 5.pow(it) }

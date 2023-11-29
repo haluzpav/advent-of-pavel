@@ -8,7 +8,7 @@ import kotlin.math.max
 import kotlin.math.sign
 
 class Day09(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String = countTailPositions(ropeLength = 2).toString()
 
     override fun part2(): String = countTailPositions(ropeLength = 10).toString()

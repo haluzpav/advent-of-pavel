@@ -33,20 +33,20 @@ fun createKotlinSrcFileContent(year: String, day: String): String = """
     package cz.veleto.aoc.year$year
 
     import cz.veleto.aoc.core.AocDay
-    
+
     class Day$day(config: Config) : AocDay(config) {
-    
+
         override fun part1(): String {
             // TODO
             return ""
         }
-    
+
         override fun part2(): String {
             // TODO
             return ""
         }
     }
-    
+
 """.trimIndent()
 
 fun createKotlinTestFileContent(year: String, day: String): String = """
@@ -55,21 +55,21 @@ fun createKotlinTestFileContent(year: String, day: String): String = """
     import cz.veleto.aoc.core.AocDay
     import kotlin.test.Test
     import kotlin.test.assertEquals
-    
+
     class Day${day}Test {
         private val task = Day$day(AocDay.Config("Day${day}_test"))
-    
+
         @Test
         fun testPart1() {
             assertEquals("TODO", task.part1())
         }
-    
+
         @Test
         fun testPart2() {
             assertEquals("TODO", task.part2())
         }
     }
-    
+
 """.trimIndent()
 
 fun Path.createFile(text: String) {

@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 
 class Day19(config: Config) : AocDay(config) {
-    
+
     private val inputRegex = Regex(
         """
             ^Blueprint ([0-9]+):

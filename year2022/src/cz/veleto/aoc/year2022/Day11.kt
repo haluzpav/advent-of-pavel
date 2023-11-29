@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.component6
 
 class Day11(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String {
         val monkeys = parseMonkeys()
         return simulate(monkeys, rounds = 20) { it / 3 }

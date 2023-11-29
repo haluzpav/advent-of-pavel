@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 
 class Day05(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String {
         val stacks = parseStacks()
         cachedInput.dropWhile { !it.startsWith("move") }

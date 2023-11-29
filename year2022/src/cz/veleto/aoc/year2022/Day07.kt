@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 
 class Day07(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String {
         val graph = parseIntoGraph()
         calculateDirSizes(graph)

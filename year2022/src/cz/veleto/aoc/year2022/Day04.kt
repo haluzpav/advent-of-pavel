@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 
 class Day04(config: Config) : AocDay(config) {
-    
+
     override fun part1(): String = input
         .map(::parseRanges)
         .count { (a, b) -> a.fullyIn(b) || b.fullyIn(a) }

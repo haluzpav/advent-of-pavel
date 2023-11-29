@@ -6,7 +6,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class Day14(config: Config) : AocDay(config) {
-    
+
     private val xShift = -300
     private val maxX = 700
     private val maxXShifted = maxX + xShift
