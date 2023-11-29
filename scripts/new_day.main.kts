@@ -9,36 +9,68 @@ import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 
+// TODO parse example test data
 // TODO also update createDayCommon somehow...
-
-println("New day, new elf adventure!")
-
-// region init
-require(args.size == 2) { "Expecting year and day as arguments" }
 
 fun String.isPositiveInt(): Boolean = toIntOrNull().let { it != null && it > 0 }
 
-val year = args[0]
-val day = args[1]
-require(year.length == 4 && year.isPositiveInt()) { "Expecting year arg in YYYY format" }
-require(day.length == 2 && day.isPositiveInt()) { "Expecting day arg in DD format" }
+fun parseArgs(): Pair<String, String> {
+    require(args.size == 2) { "Expecting year and day as arguments" }
 
-val modulePath = Path("year$year")
-check(modulePath.isDirectory()) { "Module for year $year does not exist yet" }
-// endregion
+    val year = args[0]
+    val day = args[1]
+    require(year.length == 4 && year.isPositiveInt()) { "Expecting year arg in YYYY format" }
+    require(day.length == 2 && day.isPositiveInt()) { "Expecting day arg in DD format" }
 
-// region kotlin files
-println("Creating Kotlin files...")
+    return year to day
+}
 
-val packagePath = Path("cz", "veleto", "aoc", "year$year")
+fun createModulePath(year: String): Path = Path("year${year}").also {
+    check(it.isDirectory()) { "Module for year $year does not exist yet" }
+}
 
-fun createKotlinFilePath(type: String, fileSuffix: String = ""): Path =
-    modulePath.resolve(type).resolve(packagePath).resolve("Day$day$fileSuffix.kt")
+fun createKotlinSrcFileContent(year: String, day: String): String = """
+    package cz.veleto.aoc.year$year
 
-val srcFile = createKotlinFilePath("src")
-val testFile = createKotlinFilePath("test", fileSuffix = "Test")
+    import cz.veleto.aoc.core.AocDay
+    
+    class Day$day(config: Config) : AocDay(config) {
+    
+        override fun part1(): String {
+            // TODO
+            return ""
+        }
+    
+        override fun part2(): String {
+            // TODO
+            return ""
+        }
+    }
+    
+""".trimIndent()
 
-listOf(srcFile, testFile).forEach { it.createParentDirectories() }
+fun createKotlinTestFileContent(year: String, day: String): String = """
+    package cz.veleto.aoc.year$year
+
+    import cz.veleto.aoc.core.AocDay
+    import kotlin.test.Test
+    import kotlin.test.assertEquals
+    
+    class Day${day}Test {
+        private val task = Day$day(AocDay.Config("Day${day}_test"))
+    
+        @Test
+        fun testPart1() {
+            assertEquals("TODO", task.part1())
+        }
+    
+        @Test
+        fun testPart2() {
+            assertEquals("TODO", task.part2())
+        }
+    }
+    
+""".trimIndent()
 
 fun Path.createFile(text: String) {
     writeText(
@@ -48,59 +80,28 @@ fun Path.createFile(text: String) {
     )
 }
 
-srcFile.createFile(
-    """
-        package cz.veleto.aoc.year$year
+fun createKotlinFiles(modulePath: Path, year: String, day: String): List<Path> {
+    val packagePath = Path("cz", "veleto", "aoc", "year$year")
 
-        import cz.veleto.aoc.core.AocDay
-        
-        class Day$day(config: Config) : AocDay(config) {
-        
-            override fun part1(): String {
-                // TODO
-            }
-        
-            override fun part2(): String {
-                // TODO
-            }
-        }
-        
-    """.trimIndent()
-)
+    fun createKotlinFilePath(type: String, fileSuffix: String = ""): Path =
+        modulePath.resolve(type).resolve(packagePath).resolve("Day$day$fileSuffix.kt")
 
-testFile.createFile(
-    """
-        package cz.veleto.aoc.year$year
+    val srcFile = createKotlinFilePath("src")
+    val testFile = createKotlinFilePath("test", fileSuffix = "Test")
 
-        import cz.veleto.aoc.core.AocDay
-        import kotlin.test.Test
-        import kotlin.test.assertEquals
-        
-        class Day${day}Test {
-            private val task = Day$day(AocDay.Config("Day${day}_test"))
-        
-            @Test
-            fun testPart1() {
-                assertEquals("TODO", task.part1())
-            }
-        
-            @Test
-            fun testPart2() {
-                assertEquals("TODO", task.part2())
-            }
-        }
-        
-    """.trimIndent()
-)
-// endregion
+    val filePaths = listOf(srcFile, testFile)
+    filePaths.forEach { it.createParentDirectories() }
 
-// region input data
-println("Fetching input data...")
+    srcFile.createFile(createKotlinSrcFileContent(year, day))
+    testFile.createFile(createKotlinTestFileContent(year, day))
 
-fun createInputFilePath(fileSuffix: String = ""): Path =
+    return filePaths
+}
+
+fun createInputFilePath(modulePath: Path, day: String, fileSuffix: String = ""): Path =
     modulePath.resolve("inputs").resolve("Day$day$fileSuffix.txt")
 
-fun Path.fetchInput(commandSuffix: String? = null) {
+fun Path.fetchInput(year: String, day: String, commandSuffix: String? = null) {
     check(notExists()) { "Input file already exists" }
     val aocd: Process = listOfNotNull("aocd", year, day, commandSuffix).toTypedArray().awaitProcess()
     if (aocd.exitValue() != 0) {
@@ -115,25 +116,45 @@ fun Array<String>.awaitProcess(): Process = Runtime.getRuntime().exec(this).appl
     waitFor()
 }
 
-val exampleInputFile = createInputFilePath(fileSuffix = "_test")
-val seriousInputFile = createInputFilePath()
+fun createInputFiles(modulePath: Path, year: String, day: String): List<Path> {
+    val exampleInputFile = createInputFilePath(modulePath, day, fileSuffix = "_test")
+    val seriousInputFile = createInputFilePath(modulePath, day)
 
-listOf(exampleInputFile, seriousInputFile).forEach { it.createParentDirectories() }
+    val filePaths = listOf(exampleInputFile, seriousInputFile)
+    filePaths.forEach { it.createParentDirectories() }
 
-exampleInputFile.fetchInput(commandSuffix = "-e")
-seriousInputFile.fetchInput()
-// endregion
+    exampleInputFile.fetchInput(year, day, commandSuffix = "-e")
+    seriousInputFile.fetchInput(year, day)
 
-// region git add
-println("Adding files to git...")
-val createdFiles = listOf(srcFile, testFile, exampleInputFile, seriousInputFile)
-val git: Process = (arrayOf("git", "add") + createdFiles.map(Path::toString).toTypedArray()).awaitProcess()
-check(git.exitValue() == 0) { "Adding files to git failed" }
-// endregion
+    return filePaths
+}
 
-// region report
-println("Created files:")
-createdFiles.forEach { println("\t$it") }
-// endregion
+fun addFilesToGit(filePaths: List<Path>) {
+    val git: Process = (arrayOf("git", "add") + filePaths.map(Path::toString).toTypedArray()).awaitProcess()
+    check(git.exitValue() == 0) { "Adding files to git failed" }
+}
 
-println("Have fun!")
+fun main() {
+    println("New day, new elf adventure!")
+
+    val (year, day) = parseArgs()
+    val modulePath = createModulePath(year)
+
+    println("Creating Kotlin files...")
+    val kotlinFiles = createKotlinFiles(modulePath, year, day)
+
+    println("Fetching input data...")
+    val inputFiles = createInputFiles(modulePath, year, day)
+
+    val createdFiles = kotlinFiles + inputFiles
+
+    println("Adding files to git...")
+    addFilesToGit(createdFiles)
+
+    println("Created files:")
+    createdFiles.forEach { println("\t$it") }
+
+    println("Have fun!")
+}
+
+main()
