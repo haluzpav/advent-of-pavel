@@ -8,10 +8,8 @@ import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isDirectory
 import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
-import kotlin.io.path.writeLines
 import kotlin.io.path.writeText
 
-// TODO handle more than one example test data in a day
 // TODO also update createDayCommon somehow...
 
 fun String.isPositiveInt(): Boolean = toIntOrNull().let { it != null && it > 0 }
@@ -51,7 +49,34 @@ fun createKotlinSrcFileContent(year: String, day: String): String = """
 
 """.trimIndent()
 
-fun createKotlinTestFileContent(year: String, day: String, answerA: String?, answerB: String?): String = """
+fun createKotlinTestFunction(day: String, part: Int, exampleInputSuffix: String, answer: String) = """
+    @Test
+    fun testPart$part$exampleInputSuffix() {
+        val task = Day$day(AocDay.Config("Day${day}_test$exampleInputSuffix"))
+        assertEquals("$answer", task.part$part())
+    }
+""".trimIndent()
+
+fun createKotlinTestFunctions(day: String, answers: List<Pair<String?, String?>>): String = buildString {
+    answers.forEachIndexed { inputIndex, inputAnswers ->
+        inputAnswers.toList().forEachIndexed { partIndex, answer ->
+            if (answer != null) {
+                val suffix = if (answers.size > 1) "_${inputIndex + 1}" else ""
+                appendLine()
+                appendLine(
+                    createKotlinTestFunction(
+                        day = day,
+                        part = partIndex + 1,
+                        exampleInputSuffix = suffix,
+                        answer = answer,
+                    ).prependIndent()
+                )
+            }
+        }
+    }
+}
+
+fun createKotlinTestFileContent(year: String, day: String, answers: List<Pair<String?, String?>>): String = """
     package cz.veleto.aoc.year$year
 
     import cz.veleto.aoc.core.AocDay
@@ -59,20 +84,9 @@ fun createKotlinTestFileContent(year: String, day: String, answerA: String?, ans
     import kotlin.test.assertEquals
 
     class Day${day}Test {
-        private val task = Day$day(AocDay.Config("Day${day}_test"))
+    %s}
 
-        @Test
-        fun testPart1() {
-            assertEquals("%s", task.part1())
-        }
-
-        @Test
-        fun testPart2() {
-            assertEquals("%s", task.part2())
-        }
-    }
-
-""".trimIndent().format(answerA ?: "TODO", answerB ?: "TODO")
+""".trimIndent().format(createKotlinTestFunctions(day, answers))
 
 fun Path.createFile(text: String) {
     writeText(
@@ -86,8 +100,7 @@ fun createKotlinFiles(
     modulePath: Path,
     year: String,
     day: String,
-    answerA: String?,
-    answerB: String?,
+    answers: List<Pair<String?, String?>>,
 ): List<Path> {
     val packagePath = Path("cz", "veleto", "aoc", "year$year")
 
@@ -101,7 +114,7 @@ fun createKotlinFiles(
     filePaths.forEach { it.createParentDirectories() }
 
     srcFile.createFile(createKotlinSrcFileContent(year, day))
-    testFile.createFile(createKotlinTestFileContent(year, day, answerA, answerB))
+    testFile.createFile(createKotlinTestFileContent(year, day, answers))
 
     return filePaths
 }
@@ -125,49 +138,37 @@ fun Array<String>.awaitProcess(): Process = Runtime.getRuntime().exec(this).appl
     waitFor()
 }
 
-fun createInputFiles(modulePath: Path, year: String, day: String): Triple<List<Path>, String?, String?> {
-    val exampleInputFile = createInputFilePath(modulePath, day, fileSuffix = "_test")
+fun fetchSeriousInput(modulePath: Path, year: String, day: String): Path {
     val seriousInputFile = createInputFilePath(modulePath, day)
-
-    val inputFiles = listOf(exampleInputFile, seriousInputFile)
-    inputFiles.forEach { it.createParentDirectories() }
-
-    val (answerA, answerB) = fetchExampleInput(exampleInputFile, year, day)
+    seriousInputFile.createParentDirectories()
     fetchInput(year, day).copyTo(seriousInputFile.outputStream())
-
-    return Triple(inputFiles, answerA, answerB)
+    return seriousInputFile
 }
 
-fun fetchExampleInput(targetPath: Path, year: String, day: String): Pair<String?, String?> {
-    val lines = fetchInput(year, day, commandSuffix = "-e").reader().readLines()
-    check("/${year}/day/${day.toInt()} " in lines[1]) { "Example input isn't for the requested year and day" }
+// parsing Python print output, lol, don't judge, yolo
+fun fetchExampleInputs(modulePath: Path, year: String, day: String): List<Triple<Path, String?, String?>> {
+    fun execPython(toPrint: String): Process = listOf(
+        "python",
+        "-c",
+        "from aocd.models import Puzzle; e = Puzzle(year=$year, day=${day.toInt()})._get_examples(); print($toPrint)",
+    ).toTypedArray().awaitProcess()
 
-    val hasSingleData = " 1/1 " in lines[2]
-    return if (hasSingleData) {
-        parseSingleData(targetPath, lines)
-    } else {
-        targetPath.writeLines(lines)
-        null to null
+    fun Process.readSingleLine(): String = inputStream.reader().readLines().single()
+
+    val exampleCount = execPython("len(e)").readSingleLine().toInt()
+
+    return List(exampleCount) { exampleIndex ->
+        val fileSuffixSuffix = if (exampleCount > 1) "_${exampleIndex + 1}" else ""
+        val filePath = createInputFilePath(modulePath, day, fileSuffix = "_test$fileSuffixSuffix")
+        filePath.createParentDirectories()
+
+        fun fetchAnswer(type: String): String? =
+            execPython("e[$exampleIndex].answer_$type").readSingleLine().takeIf { it != "None" }
+
+        execPython("e[$exampleIndex].input_data").inputStream.copyTo(filePath.outputStream())
+
+        Triple(filePath, fetchAnswer("a"), fetchAnswer("b"))
     }
-}
-
-fun parseSingleData(targetPath: Path, lines: List<String>): Pair<String?, String?> {
-    val separatorStart = "---"
-    val answerARegex = Regex("^answer_a: (.+)$")
-    val answerBRegex = Regex("^answer_b: (.+)$")
-
-    val answerAIndex = lines.indexOfFirst { it.matches(answerARegex) }
-    check(answerAIndex - 1 > 2) { "Example data don't match expected format [0]" }
-    check(lines[answerAIndex - 1].startsWith(separatorStart)) { "Example data don't match expected format [1]" }
-    check(lines[answerAIndex + 1].matches(answerBRegex)) { "Example data don't match expected format [2]" }
-    check(lines[answerAIndex + 2].startsWith(separatorStart)) { "Example data don't match expected format [3]" }
-
-    targetPath.writeLines(lines.subList(3, answerAIndex - 1))
-
-    val (answerA) = answerARegex.matchEntire(lines[answerAIndex])!!.destructured
-    val (answerB) = answerBRegex.matchEntire(lines[answerAIndex + 1])!!.destructured
-
-    return answerA to answerB
 }
 
 fun addFilesToGit(filePaths: List<Path>) {
@@ -182,10 +183,12 @@ fun main() {
     val modulePath = createModulePath(year)
 
     println("Fetching input data...")
-    val (inputFiles, answerA, answerB) = createInputFiles(modulePath, year, day)
+    val exampleInputs = fetchExampleInputs(modulePath, year, day)
+    val seriousInputFile = fetchSeriousInput(modulePath, year, day)
+    val inputFiles = exampleInputs.map { it.first } + listOf(seriousInputFile)
 
     println("Creating Kotlin files...")
-    val kotlinFiles = createKotlinFiles(modulePath, year, day, answerA, answerB)
+    val kotlinFiles = createKotlinFiles(modulePath, year, day, exampleInputs.map { it.second to it.third })
 
     val createdFiles = kotlinFiles + inputFiles
 
