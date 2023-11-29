@@ -50,14 +50,45 @@ fun Path.createFile(text: String) {
 
 srcFile.createFile(
     """
-        hello impl
+        package cz.veleto.aoc.year$year
+
+        import cz.veleto.aoc.core.AocDay
+        
+        class Day$day(config: Config) : AocDay(config) {
+        
+            override fun part1(): String {
+                // TODO
+            }
+        
+            override fun part2(): String {
+                // TODO
+            }
+        }
         
     """.trimIndent()
 )
 
 testFile.createFile(
     """
-        hello test
+        package cz.veleto.aoc.year$year
+
+        import cz.veleto.aoc.core.AocDay
+        import kotlin.test.Test
+        import kotlin.test.assertEquals
+        
+        class Day${day}Test {
+            private val task = Day$day(AocDay.Config("Day${day}_test"))
+        
+            @Test
+            fun testPart1() {
+                assertEquals("TODO", task.part1())
+            }
+        
+            @Test
+            fun testPart2() {
+                assertEquals("TODO", task.part2())
+            }
+        }
         
     """.trimIndent()
 )
