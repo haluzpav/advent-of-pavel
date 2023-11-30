@@ -12,7 +12,6 @@ class Day03(config: Config) : AocDay(config) {
     }.sum().toString()
 
     override fun part2(): String = input.chunked(3) { group ->
-        println(group)
         check(group.size == 3)
         val inAll = group.map { it.toSet() }.reduce { acc, chars -> acc.intersect(chars) }.single()
         inAll.priority
