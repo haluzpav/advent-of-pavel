@@ -1,6 +1,7 @@
 package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.AocDay
+import cz.veleto.aoc.core.fullyIn
 
 class Day04(config: Config) : AocDay(config) {
 
@@ -25,7 +26,4 @@ class Day04(config: Config) : AocDay(config) {
         }
         .also { check(it.size == 2) }
         .let { (a, b) -> a to b }
-
-    private fun <T : Comparable<T>> ClosedRange<T>.fullyIn(other: ClosedRange<T>): Boolean =
-        start in other && endInclusive in other
 }

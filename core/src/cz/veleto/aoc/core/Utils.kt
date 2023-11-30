@@ -20,3 +20,6 @@ inline fun <reified T : Enum<T>> T.rotateBy(rotations: Int): T {
 fun Int.positiveRem(other: Int): Int = (rem(other) + other).rem(other)
 
 fun <T> List<T>.getWrapped(index: Int) = this[index.positiveRem(size)]
+
+fun <T : Comparable<T>> ClosedRange<T>.fullyIn(other: ClosedRange<T>): Boolean =
+    start in other && endInclusive in other
