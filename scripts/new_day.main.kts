@@ -12,6 +12,9 @@ import kotlin.io.path.readLines
 import kotlin.io.path.writeLines
 import kotlin.io.path.writeText
 
+// TODO don't rely on part 2 being present - it's not! Init only with p1, create some mock for p2?
+// TODO update main
+
 fun String.isPositiveInt(): Boolean = toIntOrNull().let { it != null && it > 0 }
 
 fun parseArgs(): Pair<String, String> {
