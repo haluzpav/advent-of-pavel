@@ -29,10 +29,10 @@ class Day04(config: Config) : AocDay(config) {
                 oldCopies + newCopies
             }.also { if (config.log) println("\tHandling copies $copies, new copies $it") }
         }
-        .drop(1)
-        .fold(0) { acc, copies ->
-            acc + 1 + copies.getOrElse(0) { 0 }
-        }
+        .drop(1) // init value of fold above
+        .map { copiesBuffer -> copiesBuffer.getOrElse(0) { 0 } }
+        .map { copies -> 1 + copies }
+        .sum()
         .toString()
 
     private fun Sequence<String>.parseAndMatch(): Sequence<Int> = mapIndexed { index, line ->
