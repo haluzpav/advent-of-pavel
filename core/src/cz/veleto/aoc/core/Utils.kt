@@ -35,3 +35,21 @@ fun IntRange.expand(by: Int): IntRange =
 
 fun IntRange.shift(by: Int): IntRange =
     start + by..endInclusive + by
+
+fun <T> Iterable<T>.popFirstOrElse(defaultValue: () -> T): Pair<T, List<T>> =
+    (firstOrNull() ?: defaultValue()) to drop(1)
+
+/**
+ * Zips up the 2 iterables. If one is shorter than the other, [defaultValue] will be used instead of
+ * the missing values. Alternative to the standard [Iterable.zip].
+ */
+fun <T, V> Iterable<T>.zipLongest(other: Iterable<T>, defaultValue: () -> T, transform: (T, T) -> V): List<V> {
+    val first = iterator()
+    val second = other.iterator()
+    fun Iterator<T>.nextOrDefault(): T = if (hasNext()) next() else defaultValue()
+    return buildList {
+        while (first.hasNext() || second.hasNext()) {
+            this += transform(first.nextOrDefault(), second.nextOrDefault())
+        }
+    }
+}

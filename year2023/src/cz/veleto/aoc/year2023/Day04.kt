@@ -1,7 +1,8 @@
 package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
-import kotlin.math.max
+import cz.veleto.aoc.core.popFirstOrElse
+import cz.veleto.aoc.core.zipLongest
 import kotlin.math.pow
 
 class Day04(config: Config) : AocDay(config) {
@@ -20,14 +21,10 @@ class Day04(config: Config) : AocDay(config) {
     override fun part2(): String = input
         .parseAndMatch()
         .runningFold(emptyList<Int>()) { copies, matchingCount ->
-            val copyCountOfThisCard = copies.getOrElse(0) { 0 }
-            val remainingCopies = copies.drop(1)
-            val newCopiesSize = max(remainingCopies.size, matchingCount)
-            List(newCopiesSize) { copyIndex ->
-                val oldCopies = remainingCopies.getOrElse(copyIndex) { 0 }
-                val newCopies = if (copyIndex < matchingCount) (1 + copyCountOfThisCard) else 0
-                oldCopies + newCopies
-            }.also { if (config.log) println("\tHandling copies $copies, new copies $it") }
+            val (copyCountOfThisCard, remainingCopies) = copies.popFirstOrElse { 0 }
+            val createdCopies = List(matchingCount) { 1 + copyCountOfThisCard }
+            remainingCopies.zipLongest(createdCopies, defaultValue = { 0 }, transform = Int::plus)
+                .also { if (config.log) println("\tHandling copies $copies, new copies $it") }
         }
         .drop(1) // init value of fold above
         .map { copiesBuffer -> copiesBuffer.getOrElse(0) { 0 } }
