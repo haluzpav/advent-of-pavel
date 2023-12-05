@@ -11,4 +11,10 @@ class Day05Test {
         val task = Day05(AocDay.Config("Day05_test"))
         assertEquals("35", task.part1())
     }
+
+    @Test
+    fun testPart2() {
+        val task = Day05(AocDay.Config("Day05_test"))
+        assertEquals("46", task.part2())
+    }
 }

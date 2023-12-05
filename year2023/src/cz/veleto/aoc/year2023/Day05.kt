@@ -5,7 +5,8 @@ import cz.veleto.aoc.core.AocDay
 class Day05(config: Config) : AocDay(config) {
 
     data class Problem(
-        val seeds: List<Long>,
+        val rawSeeds: List<Long>, // for part 1
+        val seedRanges: List<LongRange>, // for part 2
         val maps: List<Map>,
     ) {
         data class Map(
@@ -21,18 +22,20 @@ class Day05(config: Config) : AocDay(config) {
 
     override fun part1(): String {
         val problem = input.parse()
-        val locations = problem.mapSeedToLocation()
+        val locations = problem.mapSeedsToLocations()
         return locations.min().toString()
     }
 
     override fun part2(): String {
-        // TODO
-        return ""
+        val problem = input.parse()
+        val locationRanges = problem.mapSeedRangesToLocations()
+        return locationRanges.minOf { it.first }.toString()
     }
 
     private fun Sequence<String>.parse(): Problem {
         val iterator = iterator()
-        val seeds = iterator.next().drop(7).split(' ').map { it.toLong() }
+        val rawSeeds = iterator.next().drop(7).split(' ').map { it.toLong() }
+        val seedRanges = rawSeeds.chunked(2) { (start, length) -> start..<start + length }
         iterator.next()
         val maps = buildList {
             while (iterator.hasNext()) {
@@ -40,7 +43,8 @@ class Day05(config: Config) : AocDay(config) {
             }
         }
         return Problem(
-            seeds = seeds,
+            rawSeeds = rawSeeds,
+            seedRanges = seedRanges,
             maps = maps,
         )
     }
@@ -59,12 +63,17 @@ class Day05(config: Config) : AocDay(config) {
             .toList(),
     )
 
-    private fun Problem.mapSeedToLocation(): List<Long> = maps.fold(seeds) { seeds, map ->
+    private fun Problem.mapSeedsToLocations(): List<Long> = maps.fold(rawSeeds) { seeds, map ->
         seeds.map { seed ->
             map.ranges
                 .firstOrNull { seed in it.source }
                 ?.let { range -> range.destination.first + seed - range.source.first }
                 ?: seed
         }
+    }
+
+    private fun Problem.mapSeedRangesToLocations(): List<LongRange> {
+        // TODO
+        return emptyList()
     }
 }
