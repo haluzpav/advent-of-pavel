@@ -1,5 +1,8 @@
 package cz.veleto.aoc.core
 
+import kotlin.math.max
+import kotlin.math.min
+
 @Suppress("RemoveExplicitTypeArguments")
 fun <T, U> Iterable<T>.splitBy(predicate: (T) -> Boolean, mapElement: (T) -> U): List<List<U>> =
     fold(mutableListOf(mutableListOf<U>())) { acc, s ->
@@ -22,7 +25,7 @@ fun Int.positiveRem(other: Int): Int = (rem(other) + other).rem(other)
 fun <T> List<T>.getWrapped(index: Int) = this[index.positiveRem(size)]
 
 fun <T : Comparable<T>> ClosedRange<T>.fullyIn(other: ClosedRange<T>): Boolean =
-    start in other && endInclusive in other
+    isEmpty() || start in other && endInclusive in other
 
 fun <T : Comparable<T>> ClosedRange<T>.overlapsWith(other: ClosedRange<T>): Boolean =
     start in other || endInclusive in other || other.fullyIn(this)
@@ -36,8 +39,20 @@ fun IntRange.expand(by: Int): IntRange =
 fun IntRange.shift(by: Int): IntRange =
     start + by..endInclusive + by
 
+fun LongRange.shift(by: Long): LongRange =
+    start + by..endInclusive + by
+
+fun LongRange.intersect(other: LongRange): LongRange =
+    max(first, other.first)..min(last, other.last)
+
 fun <T> Iterable<T>.popFirstOrElse(defaultValue: () -> T): Pair<T, List<T>> =
     (firstOrNull() ?: defaultValue()) to drop(1)
+
+fun <T> List<T>.popLastOrElse(defaultValue: () -> T): Pair<List<T>, T> =
+    dropLast(1) to (lastOrNull() ?: defaultValue())
+
+fun <T> List<T>.popLastOrNull(): Pair<List<T>, T?> =
+    dropLast(1) to lastOrNull()
 
 /**
  * Zips up the 2 iterables. If one is shorter than the other, [defaultValue] will be used instead of
