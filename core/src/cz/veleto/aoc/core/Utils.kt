@@ -46,10 +46,16 @@ fun <T> Iterable<T>.popFirstOrElse(defaultValue: () -> T): Pair<T, List<T>> =
 fun <T, V> Iterable<T>.zipLongest(other: Iterable<T>, defaultValue: () -> T, transform: (T, T) -> V): List<V> {
     val first = iterator()
     val second = other.iterator()
-    fun Iterator<T>.nextOrDefault(): T = if (hasNext()) next() else defaultValue()
+    fun Iterator<T>.nextOrDefault(): T = nextOrDefault(defaultValue)
     return buildList {
         while (first.hasNext() || second.hasNext()) {
             this += transform(first.nextOrDefault(), second.nextOrDefault())
         }
     }
 }
+
+fun <T> Iterator<T>.nextOrDefault(defaultValue: () -> T): T =
+    if (hasNext()) next() else defaultValue()
+
+fun <T> Iterator<T>.nextOrNull(): T? =
+    if (hasNext()) next() else null
