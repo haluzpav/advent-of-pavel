@@ -2,6 +2,8 @@ package cz.veleto.aoc.core
 
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 @Suppress("RemoveExplicitTypeArguments")
 fun <T, U> Iterable<T>.splitBy(predicate: (T) -> Boolean, mapElement: (T) -> U): List<List<U>> =
@@ -74,3 +76,10 @@ fun <T> Iterator<T>.nextOrDefault(defaultValue: () -> T): T =
 
 fun <T> Iterator<T>.nextOrNull(): T? =
     if (hasNext()) next() else null
+
+fun solveQuadratic(a: Double, b: Double, c: Double): Pair<Double, Double> {
+    val det = b.pow(2) - 4 * a * c
+    val x1 = (-b - sqrt(det)) / 2 / a
+    val x2 = (-b + sqrt(det)) / 2 / a
+    return x1 to x2
+}
