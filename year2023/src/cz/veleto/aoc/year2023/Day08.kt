@@ -24,6 +24,8 @@ class Day08(config: Config) : AocDay(config) {
             .toString()
     }
 
+    var logged: Boolean = false
+
     override fun part2(): String {
         val (instructions, nodes) = cachedInput.parse()
         val startState = State2(
@@ -33,10 +35,42 @@ class Day08(config: Config) : AocDay(config) {
         if (config.log) println("Starting at ${startState.nodeNames}")
         return instructions
             .runningFold(startState) { state, instruction ->
+                val nextNodes = state.currentNodes.map { it.navigateToNextNode(nodes, instruction) }
+                val stepsTaken = state.stepsTaken + 1
+                val newVisitedNodes = nextNodes
+                    .mapIndexed { index, node ->
+                        val oldVisits = state.visitedNodes.getOrElse(node) { emptyList() }
+                        val newVisit = NodeVisit(
+                            startNode = startState.currentNodes[index],
+                            atStep = stepsTaken,
+                            atInstruction = instruction.index,
+                        )
+                        node to oldVisits + newVisit
+                    }
+                    .toMap()
                 State2(
-                    currentNodes = state.currentNodes.map { it.navigateToNextNode(nodes, instruction) },
-                    stepsTaken = state.stepsTaken + 1,
+                    currentNodes = nextNodes,
+                    stepsTaken = stepsTaken,
+                    visitedNodes = state.visitedNodes + newVisitedNodes,
                 ).also { if (config.log) it.log() }
+            }
+            .onEach { state ->
+                if (!logged && state.stepsTaken == 1_000L) {
+                    state.visitedNodes.forEach { (node, allVisits) ->
+                        allVisits
+                            .groupBy { it.startNode }
+                            .filter { (_, visits) -> visits.size > 1 }
+                            .forEach { (startNode, visits) ->
+                                if (config.log) {
+                                    println("Found repeated visit of ${node.name} by strand ${startNode.name}, visits:")
+                                    visits.forEach { visit ->
+                                        println("\tat step ${visit.atStep}, at instruction ${visit.atInstruction}")
+                                    }
+                                }
+                            }
+                    }
+                    logged = true
+                }
             }
             .first { it.isEndState() }
             .stepsTaken
@@ -52,8 +86,8 @@ class Day08(config: Config) : AocDay(config) {
     private fun State2.isEndState(): Boolean =
         currentNodes.all { it.isEndNode() }
 
-    private fun Node.navigateToNextNode(nodes: Map<String, Node>, instruction: Char): Node {
-        val newNode = when (instruction) {
+    private fun Node.navigateToNextNode(nodes: Map<String, Node>, instruction: IndexedValue<Char>): Node {
+        val newNode = when (instruction.value) {
             'L' -> left
             'R' -> right
             else -> error("undefined instruction $instruction")
@@ -61,8 +95,8 @@ class Day08(config: Config) : AocDay(config) {
         return nodes[newNode]!!
     }
 
-    private fun List<String>.parse(): Pair<Sequence<Char>, Map<String, Node>> {
-        val instructions = this[0].toList()
+    private fun List<String>.parse(): Pair<Sequence<IndexedValue<Char>>, Map<String, Node>> {
+        val instructions = this[0].toList().withIndex()
         val repeatingInstructions = sequence {
             while (true) yieldAll(instructions)
         }
@@ -76,7 +110,7 @@ class Day08(config: Config) : AocDay(config) {
     }
 
     private fun State2.log() {
-        if (stepsTaken % 10_000_000 == 0L) {
+        if (stepsTaken % 10_000_0 == 0L) {
             println("Step $stepsTaken, navigating to $nodeNames")
         }
         if (currentNodes.count { it.isEndNode() } >= 4) {
@@ -98,7 +132,7 @@ class Day08(config: Config) : AocDay(config) {
     data class State2(
         val currentNodes: List<Node>,
         val stepsTaken: Long,
-        val visitedNodes: Map<Node, List<NodeVisit>> = emptyMap(), // TODO use
+        val visitedNodes: Map<Node, List<NodeVisit>> = emptyMap(),
     ) {
         val nodeNames: List<String>
             get() = currentNodes.map { it.name }
@@ -116,6 +150,6 @@ class Day08(config: Config) : AocDay(config) {
     data class NodeVisit(
         val startNode: Node,
         val atStep: Long,
-        val atInstruction: Long,
+        val atInstruction: Int,
     )
 }
