@@ -52,8 +52,9 @@ class Day08(config: Config) : AocDay(config) {
                     currentNodes = nextNodes,
                     stepsTaken = stepsTaken,
                     visitedNodes = state.visitedNodes + newVisitedNodes,
-                ).also { if (config.log) it.log() }
+                )
             }
+            .onEach { if (config.log) it.log() }
             .onEach { state ->
                 if (!logged && state.stepsTaken == 1_000L) {
                     state.visitedNodes.forEach { (node, allVisits) ->
