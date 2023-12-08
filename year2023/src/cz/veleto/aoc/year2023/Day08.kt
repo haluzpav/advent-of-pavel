@@ -8,14 +8,10 @@ class Day08(config: Config) : AocDay(config) {
 
     override fun part1(): String {
         val (instructions, nodes) = cachedInput.parse()
-        val startNode = "AAA".also { check(it in nodes) }
-        val endNode = "ZZZ".also { check(it in nodes) }
         val startState = State1(
-            currentNode = nodes[startNode]!!,
+            currentNode = nodes["AAA"]!!,
             stepsTaken = 0,
         )
-
-        fun State1.isEndState(): Boolean = currentNode.name == endNode
         return instructions
             .runningFold(startState) { state, instruction ->
                 State1(
@@ -23,7 +19,7 @@ class Day08(config: Config) : AocDay(config) {
                     stepsTaken = state.stepsTaken + 1,
                 )
             }
-            .first(State1::isEndState)
+            .first { it.isEndState() }
             .stepsTaken
             .toString()
     }
@@ -34,31 +30,27 @@ class Day08(config: Config) : AocDay(config) {
             currentNodes = nodes.values.filter { it.name.endsWith('A') }.also { check(it.isNotEmpty()) },
             stepsTaken = 0,
         )
-
-        fun Node.isEndNode(): Boolean = name.endsWith('Z')
-        fun State2.isEndState(): Boolean = currentNodes.all(Node::isEndNode)
-
         if (config.log) println("Starting at ${startState.nodeNames}")
         return instructions
             .runningFold(startState) { state, instruction ->
                 State2(
                     currentNodes = state.currentNodes.map { it.navigateToNextNode(nodes, instruction) },
                     stepsTaken = state.stepsTaken + 1,
-                ).also { newState ->
-                    if (config.log) {
-                        if (newState.stepsTaken % 10_000_000 == 0L) {
-                            println("Step ${newState.stepsTaken}, navigating to ${newState.nodeNames}")
-                        }
-                        if (newState.currentNodes.count { it.isEndNode() } >= 4) {
-                            println("Step ${newState.stepsTaken}, found 4 or more nodes in end-state ${newState.nodeNames}")
-                        }
-                    }
-                }
+                ).also { if (config.log) it.log() }
             }
-            .first(State2::isEndState)
+            .first { it.isEndState() }
             .stepsTaken
             .toString()
     }
+
+    private fun State1.isEndState(): Boolean =
+        currentNode.name == "ZZZ"
+
+    private fun Node.isEndNode(): Boolean =
+        name.endsWith('Z')
+
+    private fun State2.isEndState(): Boolean =
+        currentNodes.all { it.isEndNode() }
 
     private fun Node.navigateToNextNode(nodes: Map<String, Node>, instruction: Char): Node {
         val newNode = when (instruction) {
@@ -81,6 +73,15 @@ class Day08(config: Config) : AocDay(config) {
     private fun String.parseNode(): Node {
         val (name, left, right) = nodeRegex.matchEntire(this)!!.destructured
         return Node(name, left, right)
+    }
+
+    private fun State2.log() {
+        if (stepsTaken % 10_000_000 == 0L) {
+            println("Step $stepsTaken, navigating to $nodeNames")
+        }
+        if (currentNodes.count { it.isEndNode() } >= 4) {
+            println("Step $stepsTaken, reached 4 or more end-nodes $nodeNames")
+        }
     }
 
     data class Node(
