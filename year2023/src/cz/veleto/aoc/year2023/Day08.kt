@@ -98,8 +98,24 @@ class Day08(config: Config) : AocDay(config) {
     data class State2(
         val currentNodes: List<Node>,
         val stepsTaken: Long,
+        val visitedNodes: Map<Node, List<NodeVisit>> = emptyMap(), // TODO use
     ) {
         val nodeNames: List<String>
             get() = currentNodes.map { it.name }
     }
+
+    /*
+    when there's a new visit, check
+     - if the visiting strand has the same starting node
+     - if the atInstruction is the same
+    if both are true, WE HAVE A LOOP! Then
+     - current step - atStep = loop length
+     - we also have/need: steps to reach the loop, end-nodes along the loop
+    then do some mod math to quickly find when all strands reach an end-node
+     */
+    data class NodeVisit(
+        val startNode: Node,
+        val atStep: Long,
+        val atInstruction: Long,
+    )
 }
