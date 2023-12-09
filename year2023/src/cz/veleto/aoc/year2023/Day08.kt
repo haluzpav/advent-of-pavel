@@ -56,21 +56,26 @@ class Day08(config: Config) : AocDay(config) {
             }
             .onEach { if (config.log) it.log() }
             .onEach { state ->
-                if (!logged && state.stepsTaken == 1_000L) {
-                    state.visitedNodes.forEach { (node, allVisits) ->
-                        allVisits
-                            .groupBy { it.startNode }
-                            .filter { (_, visits) -> visits.size > 1 }
-                            .forEach { (startNode, visits) ->
-                                if (config.log) {
-                                    println("Found repeated visit of ${node.name} by strand ${startNode.name}, visits:")
-                                    visits.forEach { visit ->
-                                        println("\tat step ${visit.atStep}, at instruction ${visit.atInstruction}")
+                if (config.log) {
+                    if (!logged && state.stepsTaken == 100_000L) {
+                        state.visitedNodes
+                            .also { println("before ${it.size}") }
+                            .filter { (node, _) -> node.isEndNode() }
+                            .also { println("after ${it.size}") }
+                            .forEach { (node, allVisits) ->
+                                allVisits
+                                    .groupBy { it.startNode }
+                                    .filter { (_, visits) -> visits.size > 1 }
+                                    .forEach { (startNode, visits) ->
+                                        println("Found repeated visit of ${node.name} by strand ${startNode.name}, visits:")
+                                        visits.zip(listOf(null) + visits).forEach { (visit, previousVisit) ->
+                                            val stepsSincePrevious = previousVisit?.let { visit.atStep - it.atStep }
+                                            println("\tstep ${visit.atStep}, steps since previous $stepsSincePrevious, instruction ${visit.atInstruction}")
+                                        }
                                     }
-                                }
                             }
+                        logged = true
                     }
-                    logged = true
                 }
             }
             .first { it.isEndState() }
