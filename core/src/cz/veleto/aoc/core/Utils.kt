@@ -86,3 +86,16 @@ fun solveQuadratic(a: Double, b: Double, c: Double): Pair<Double, Double> {
 
 fun <T> Iterable<T>.allSame(): Boolean =
     toSet().size == 1
+
+fun leastCommonMultiple(a: Long, b: Long): Long {
+    check(a > 0 && b > 0)
+    val smaller = min(a, b)
+    val larger = max(a, b)
+    return (1..smaller)
+        .asSequence()
+        .map { it * larger }
+        .first { it % a == 0L && it % b == 0L }
+}
+
+fun leastCommonMultiple(numbers: List<Long>): Long =
+    numbers.reduce { acc, number -> leastCommonMultiple(acc, number) }

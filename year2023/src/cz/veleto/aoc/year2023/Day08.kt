@@ -2,6 +2,7 @@ package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.allSame
+import cz.veleto.aoc.core.leastCommonMultiple
 
 class Day08(config: Config) : AocDay(config) {
 
@@ -28,7 +29,6 @@ class Day08(config: Config) : AocDay(config) {
     override fun part2(): String {
         val (instructions, nodes) = cachedInput.parse()
         val startNodes = nodes.values.filter { it.name.endsWith('A') }.also { check(it.isNotEmpty()) }
-
         val cycleLengths = startNodes
             .map { startNode ->
                 val startState = State(
@@ -51,9 +51,7 @@ class Day08(config: Config) : AocDay(config) {
                 check(cycleLengths.all { it == firstStepsToEnd })
                 firstStepsToEnd
             }
-        println(cycleLengths)
-
-        return ""
+        return leastCommonMultiple(cycleLengths).toString()
     }
 
     private fun State.isEndState(allZs: Boolean): Boolean =
@@ -90,6 +88,6 @@ class Day08(config: Config) : AocDay(config) {
 
     data class State(
         val currentNode: Node,
-        val stepsTaken: Int,
+        val stepsTaken: Long,
     )
 }
