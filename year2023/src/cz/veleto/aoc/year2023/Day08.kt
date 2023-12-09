@@ -1,6 +1,7 @@
 package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
+import cz.veleto.aoc.core.allSame
 
 class Day08(config: Config) : AocDay(config) {
 
@@ -8,89 +9,55 @@ class Day08(config: Config) : AocDay(config) {
 
     override fun part1(): String {
         val (instructions, nodes) = cachedInput.parse()
-        val startState = State1(
+        val startState = State(
             currentNode = nodes["AAA"]!!,
             stepsTaken = 0,
         )
         return instructions
             .runningFold(startState) { state, instruction ->
-                State1(
+                State(
                     currentNode = state.currentNode.navigateToNextNode(nodes, instruction),
                     stepsTaken = state.stepsTaken + 1,
                 )
             }
-            .first { it.isEndState() }
+            .first { it.isEndState(allZs = true) }
             .stepsTaken
             .toString()
     }
-
-    var logged: Boolean = false
 
     override fun part2(): String {
         val (instructions, nodes) = cachedInput.parse()
-        val startState = State2(
-            currentNodes = nodes.values.filter { it.name.endsWith('A') }.also { check(it.isNotEmpty()) },
-            stepsTaken = 0,
-        )
-        if (config.log) println("Starting at ${startState.nodeNames}")
-        return instructions
-            .runningFold(startState) { state, instruction ->
-                val nextNodes = state.currentNodes.map { it.navigateToNextNode(nodes, instruction) }
-                val stepsTaken = state.stepsTaken + 1
-                val newVisitedNodes = nextNodes
-                    .mapIndexed { index, node ->
-                        val oldVisits = state.visitedNodes.getOrElse(node) { emptyList() }
-                        val newVisit = NodeVisit(
-                            startNode = startState.currentNodes[index],
-                            atStep = stepsTaken,
-                            atInstruction = instruction.index,
-                        )
-                        node to oldVisits + newVisit
-                    }
-                    .toMap()
-                State2(
-                    currentNodes = nextNodes,
-                    stepsTaken = stepsTaken,
-                    visitedNodes = state.visitedNodes + newVisitedNodes,
+        val startNodes = nodes.values.filter { it.name.endsWith('A') }.also { check(it.isNotEmpty()) }
+
+        val cycleLengths = startNodes
+            .map { startNode ->
+                val startState = State(
+                    currentNode = startNode,
+                    stepsTaken = 0,
                 )
-            }
-            .onEach { if (config.log) it.log() }
-            .onEach { state ->
-                if (config.log) {
-                    if (!logged && state.stepsTaken == 100_000L) {
-                        state.visitedNodes
-                            .also { println("before ${it.size}") }
-                            .filter { (node, _) -> node.isEndNode() }
-                            .also { println("after ${it.size}") }
-                            .forEach { (node, allVisits) ->
-                                allVisits
-                                    .groupBy { it.startNode }
-                                    .filter { (_, visits) -> visits.size > 1 }
-                                    .forEach { (startNode, visits) ->
-                                        println("Found repeated visit of ${node.name} by strand ${startNode.name}, visits:")
-                                        visits.zip(listOf(null) + visits).forEach { (visit, previousVisit) ->
-                                            val stepsSincePrevious = previousVisit?.let { visit.atStep - it.atStep }
-                                            println("\tstep ${visit.atStep}, steps since previous $stepsSincePrevious, instruction ${visit.atInstruction}")
-                                        }
-                                    }
-                            }
-                        logged = true
+                val endStates = instructions
+                    .runningFold(startState) { state, instruction ->
+                        State(
+                            currentNode = state.currentNode.navigateToNextNode(nodes, instruction),
+                            stepsTaken = state.stepsTaken + 1,
+                        )
                     }
-                }
+                    .filter { it.isEndState(allZs = false) }
+                    .take(10) // could be just 1 it seems, but let's check that re-visit happens every N steps
+                    .toList()
+                check(endStates.map { it.currentNode }.allSame())
+                val firstStepsToEnd = endStates[0].stepsTaken
+                val cycleLengths = endStates.windowed(2, 1) { (a, b) -> b.stepsTaken - a.stepsTaken }
+                check(cycleLengths.all { it == firstStepsToEnd })
+                firstStepsToEnd
             }
-            .first { it.isEndState() }
-            .stepsTaken
-            .toString()
+        println(cycleLengths)
+
+        return ""
     }
 
-    private fun State1.isEndState(): Boolean =
-        currentNode.name == "ZZZ"
-
-    private fun Node.isEndNode(): Boolean =
-        name.endsWith('Z')
-
-    private fun State2.isEndState(): Boolean =
-        currentNodes.all { it.isEndNode() }
+    private fun State.isEndState(allZs: Boolean): Boolean =
+        if (allZs) currentNode.name == "ZZZ" else currentNode.name.endsWith('Z')
 
     private fun Node.navigateToNextNode(nodes: Map<String, Node>, instruction: IndexedValue<Char>): Node {
         val newNode = when (instruction.value) {
@@ -115,47 +82,14 @@ class Day08(config: Config) : AocDay(config) {
         return Node(name, left, right)
     }
 
-    private fun State2.log() {
-        if (stepsTaken % 10_000_0 == 0L) {
-            println("Step $stepsTaken, navigating to $nodeNames")
-        }
-        if (currentNodes.count { it.isEndNode() } >= 4) {
-            println("Step $stepsTaken, reached 4 or more end-nodes $nodeNames")
-        }
-    }
-
     data class Node(
         val name: String,
         val left: String,
         val right: String,
     )
 
-    data class State1(
+    data class State(
         val currentNode: Node,
         val stepsTaken: Int,
-    )
-
-    data class State2(
-        val currentNodes: List<Node>,
-        val stepsTaken: Long,
-        val visitedNodes: Map<Node, List<NodeVisit>> = emptyMap(),
-    ) {
-        val nodeNames: List<String>
-            get() = currentNodes.map { it.name }
-    }
-
-    /*
-    when there's a new visit, check
-     - if the visiting strand has the same starting node
-     - if the atInstruction is the same
-    if both are true, WE HAVE A LOOP! Then
-     - current step - atStep = loop length
-     - we also have/need: steps to reach the loop, end-nodes along the loop
-    then do some mod math to quickly find when all strands reach an end-node
-     */
-    data class NodeVisit(
-        val startNode: Node,
-        val atStep: Long,
-        val atInstruction: Int,
     )
 }

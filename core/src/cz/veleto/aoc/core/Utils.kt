@@ -83,3 +83,6 @@ fun solveQuadratic(a: Double, b: Double, c: Double): Pair<Double, Double> {
     val x2 = (-b + sqrt(det)) / 2 / a
     return x1 to x2
 }
+
+fun <T> Iterable<T>.allSame(): Boolean =
+    toSet().size == 1
