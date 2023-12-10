@@ -1,6 +1,6 @@
 product:
   type: lib
-  platforms: [jvm, macosArm64]
+  platforms: [jvm, macosArm64, linuxX64]
 
 dependencies:
   - com.squareup.okio:okio:3.6.0
