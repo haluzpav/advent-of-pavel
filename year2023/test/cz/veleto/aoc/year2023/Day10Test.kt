@@ -31,6 +31,30 @@ class Day10Test {
     }
 
     @Test
+    fun testPart2_1() {
+        val task = Day10(AocDay.Config("Day10_test_1"))
+        assertEquals("1", task.part2())
+    }
+
+    @Test
+    fun testPart2_2() {
+        val task = Day10(AocDay.Config("Day10_test_2"))
+        assertEquals("1", task.part2())
+    }
+
+    @Test
+    fun testPart2_3() {
+        val task = Day10(AocDay.Config("Day10_test_3"))
+        assertEquals("1", task.part2())
+    }
+
+    @Test
+    fun testPart2_4() {
+        val task = Day10(AocDay.Config("Day10_test_4"))
+        assertEquals("1", task.part2())
+    }
+
+    @Test
     fun testPart2_5() {
         val task = Day10(AocDay.Config("Day10_test_5"))
         assertEquals("4", task.part2())

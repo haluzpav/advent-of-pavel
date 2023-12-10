@@ -22,3 +22,9 @@ operator fun Pair<IntRange, IntRange>.contains(pos: Pos): Boolean {
     val (x, y) = pos
     return x in xRange && y in yRange
 }
+
+fun Pos.rotateClockwise(): Pos = second to -first
+
+fun Pos.flip(): Pos = -first to -second
+
+fun Iterable<Pos>.move(pos: Pos): List<Pos> = map { it + pos }
