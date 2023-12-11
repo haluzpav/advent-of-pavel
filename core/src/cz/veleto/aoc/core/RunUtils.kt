@@ -15,6 +15,7 @@ val baseSeriousConfig = AocDay.Config(
     log = false,
     year2022day15part1row = 2_000_000,
     year2022day15part2max = 4_000_000,
+    year2023day11part2expandFactor = 1_000_000,
 )
 
 private fun AocDay.run() {

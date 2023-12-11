@@ -8,6 +8,7 @@ abstract class AocDay(protected val config: Config) {
         // TODO make Config extendable somehow ??
         val year2022day15part1row: Int = -1,
         val year2022day15part2max: Int = -1,
+        val year2023day11part2expandFactor: Int = 2,
     )
 
     protected val input: Sequence<String> = readInput(config.inputName)
