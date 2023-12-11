@@ -16,14 +16,13 @@ class Day11(config: Config) : AocDay(config) {
     override fun part2(): String = solve(expandFactor = config.year2023day11part2expandFactor)
 
     private fun solve(expandFactor: Int): String {
-        val verticalExpansion = cachedInput
-            .mapToVerticalExpansion(expandFactor)
-        val horizontalExpansion = cachedInput
-            .transpose()
-            .mapToVerticalExpansion(expandFactor)
+        val verticalExpansion = cachedInput.mapToVerticalExpansion(expandFactor)
+        val horizontalExpansion = cachedInput.transpose().mapToVerticalExpansion(expandFactor)
         val galaxies = cachedInput.findGalaxies()
         return galaxies
-            .findManhattanBetweenAllPairs { expand(verticalExpansion, horizontalExpansion) }
+            .map { it.expand(verticalExpansion, horizontalExpansion) }
+            .asSequence()
+            .findManhattanBetweenAllPairs()
             .sum()
             .toString()
     }
@@ -35,19 +34,14 @@ class Day11(config: Config) : AocDay(config) {
 
     private fun List<String>.findGalaxies(): List<Pos> = this
         .flatMapIndexed { lineIndex, line ->
-            line
-                .withIndex()
-                .filter { it.value == galaxyChar }
-                .map { lineIndex to it.index }
+            line.withIndex().filter { it.value == galaxyChar }.map { lineIndex to it.index }
         }
 
     private fun Pos.expand(verticalExpansion: List<Int>, horizontalExpansion: List<Int>): Pos =
         this + Pos(verticalExpansion[first], horizontalExpansion[second])
 
-    private fun List<Pos>.findManhattanBetweenAllPairs(expand: Pos.() -> Pos): Sequence<Long> = asSequence()
+    private fun Sequence<Pos>.findManhattanBetweenAllPairs(): Sequence<Long> = this
         .flatMapIndexed { aIndex, aPos ->
-            this
-                .drop(aIndex + 1)
-                .map { bPos -> aPos.expand().manhattanTo(bPos.expand()).toLong() }
+            drop(aIndex + 1).map { bPos -> aPos.manhattanTo(bPos).toLong() }
         }
 }
