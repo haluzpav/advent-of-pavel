@@ -1,7 +1,7 @@
 package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
-import kotlin.math.pow
+import cz.veleto.aoc.core.permute
 
 class Day12(config: Config) : AocDay(config) {
 
@@ -27,16 +27,10 @@ class Day12(config: Config) : AocDay(config) {
     }
 
     private fun countArrangements(row: String, regex: Regex): Int {
-        val unknownCount = row.count { it == '?' }
-        val maxArrs = 2.0.pow(unknownCount).toInt()
         if (config.log) println("row $row, regex ${regex.pattern}")
-        return (0..<maxArrs)
-            .asSequence()
-            .map { arrInt ->
-                (0..<unknownCount)
-                    .map { shift -> arrInt shr shift and 1 == 1 }
-                    .map { if (it) '#' else '.' }
-                    .fold(row) { row, replacement -> row.replaceFirst('?', replacement) }
+        return permute(choiceA = '#', choiceB = '.', size = row.count { it == '?' })
+            .map { permutation ->
+                permutation.fold(row) { row, replacement -> row.replaceFirst('?', replacement) }
             }
             .map { arr -> arr to regex.matches(arr) }
             .onEach { (arr, matches) ->
