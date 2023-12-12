@@ -13,6 +13,7 @@ fun runAllDays(taskBuilder: (day: Int) -> AocDay, vararg skippedDays: Int) {
 val baseSeriousConfig = AocDay.Config(
     inputName = "undefined",
     log = false,
+    verboseLog = false,
     year2022day15part1row = 2_000_000,
     year2022day15part2max = 4_000_000,
     year2023day11part2expandFactor = 1_000_000,

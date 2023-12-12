@@ -5,6 +5,7 @@ abstract class AocDay(protected val config: Config) {
     data class Config(
         val inputName: String,
         val log: Boolean = true,
+        val verboseLog: Boolean = true,
         // TODO make Config extendable somehow ??
         val year2022day15part1row: Int = -1,
         val year2022day15part2max: Int = -1,
