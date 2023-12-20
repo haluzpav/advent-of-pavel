@@ -17,5 +17,6 @@ fun createDayCommon(day: Int): AocDay = when (day) {
     11 -> Day11(baseSeriousConfig.copy(inputName = "Day11"))
     12 -> Day12(baseSeriousConfig.copy(inputName = "Day12"))
     16 -> Day16(baseSeriousConfig.copy(inputName = "Day16"))
+    18 -> Day18(baseSeriousConfig.copy(inputName = "Day18"))
     else -> error("undefined day $day")
 }
