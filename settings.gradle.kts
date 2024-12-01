@@ -19,4 +19,5 @@ include(
     "core",
     "year2022",
     "year2023",
+    "year2024",
 )
