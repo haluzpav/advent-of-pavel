@@ -6,14 +6,13 @@ import kotlin.math.abs
 class Day01(config: Config) : AocDay(config) {
 
     override fun part1(): String {
-        val (a, b) = parseRawLists()
-        return a.sorted().zip(b.sorted()).sumOf { (a, b) -> abs(a - b) }.toString()
+        val (aList, bList) = parseRawLists()
+        return aList.sorted().zip(bList.sorted()).sumOf { (a, b) -> abs(a - b) }.toString()
     }
 
     override fun part2(): String {
-        val (a, b) = parseRawLists()
-        a.sumOf { a -> a * b.count { it == a } }
-        return ""
+        val (aList, bList) = parseRawLists()
+        return aList.sumOf { a -> a * bList.count { it == a } }.toString()
     }
 
     private fun parseRawLists(): Pair<List<Int>, List<Int>> = input

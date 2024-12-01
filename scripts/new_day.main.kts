@@ -6,26 +6,28 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.Path
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.isDirectory
-import kotlin.io.path.notExists
 import kotlin.io.path.outputStream
 import kotlin.io.path.readLines
 import kotlin.io.path.writeLines
 import kotlin.io.path.writeText
 
-// TODO don't rely on part 2 being present - it's not! Init only with p1, create some mock for p2?
-// TODO update main
-
 fun String.isPositiveInt(): Boolean = toIntOrNull().let { it != null && it > 0 }
 
-fun parseArgs(): Pair<String, String> {
-    require(args.size == 2) { "Expecting year and day as arguments" }
+fun parseArgs(): Triple<String, String, Boolean> {
+    val part2Arg = "--part2"
+    require(args.size in 2..3) { "Expecting arguments: <year> <day> ($part2Arg)" }
 
     val year = args[0]
     val day = args[1]
+
+    val third = args.getOrNull(2)
+    val part2 = third == part2Arg
+
     require(year.length == 4 && year.isPositiveInt()) { "Expecting year arg in YYYY format" }
     require(day.length == 2 && day.isPositiveInt()) { "Expecting day arg in DD format" }
+    require(third == null || part2) { "Unexpected arg: $third" }
 
-    return year to day
+    return Triple(year, day, part2)
 }
 
 fun createModulePath(year: String): Path = Path("year${year}").also {
@@ -91,43 +93,47 @@ fun createKotlinTestFileContent(year: String, day: String, answers: List<Pair<St
 
 """.trimIndent().format(createKotlinTestFunctions(day, answers))
 
-fun Path.createFile(text: String) {
+fun Path.createFile(text: String): Path = apply {
     writeText(
         text = text,
         charset = Charsets.UTF_8,
-        StandardOpenOption.CREATE_NEW,
+        StandardOpenOption.TRUNCATE_EXISTING,
+        StandardOpenOption.CREATE,
     )
 }
 
 val basePackagePath = Path("cz", "veleto", "aoc")
 
-fun createKotlinFiles(
+fun createKotlinFilePath(
+    modulePath: Path,
+    year: String,
+    day: String,
+    type: String,
+    fileSuffix: String = "",
+): Path {
+    val packagePath = basePackagePath.resolve("year$year")
+    return modulePath.resolve(type).resolve(packagePath).resolve("Day$day$fileSuffix.kt")
+}
+
+fun createKotlinSrcFile(
+    modulePath: Path,
+    year: String,
+    day: String,
+): Path = createKotlinFilePath(modulePath, year, day, "src")
+    .createParentDirectories()
+    .createFile(createKotlinSrcFileContent(year, day))
+
+fun createKotlinTestFile(
     modulePath: Path,
     year: String,
     day: String,
     answers: List<Pair<String?, String?>>,
-): List<Path> {
-    val packagePath = basePackagePath.resolve("year$year")
-
-    fun createKotlinFilePath(type: String, fileSuffix: String = ""): Path =
-        modulePath.resolve(type).resolve(packagePath).resolve("Day$day$fileSuffix.kt")
-
-    val srcFile = createKotlinFilePath("src")
-    val testFile = createKotlinFilePath("test", fileSuffix = "Test")
-
-    val filePaths = listOf(srcFile, testFile)
-    filePaths.forEach { it.createParentDirectories() }
-
-    srcFile.createFile(createKotlinSrcFileContent(year, day))
-    testFile.createFile(createKotlinTestFileContent(year, day, answers))
-
-    return filePaths
-}
+): Path = createKotlinFilePath(modulePath, year, day, "test", fileSuffix = "Test")
+    .createParentDirectories()
+    .createFile(createKotlinTestFileContent(year, day, answers))
 
 fun createInputFilePath(modulePath: Path, day: String, fileSuffix: String = ""): Path =
-    modulePath.resolve("inputs").resolve("Day$day$fileSuffix.txt").also {
-        check(it.notExists()) { "Input file already exists" }
-    }
+    modulePath.resolve("inputs").resolve("Day$day$fileSuffix.txt")
 
 fun fetchInput(year: String, day: String, commandSuffix: String? = null): InputStream {
     val aocd: Process = listOfNotNull("aocd", year, day, commandSuffix).toTypedArray().awaitProcess()
@@ -192,10 +198,9 @@ fun addImplementationToBuilder(modulePath: Path, year: String, day: String) {
     path.writeLines(newLines)
 }
 
-fun main() {
+fun initializeDay(year: String, day: String) {
     println("New day, new elf adventure!")
 
-    val (year, day) = parseArgs()
     val modulePath = createModulePath(year)
 
     println("Fetching input data...")
@@ -204,9 +209,10 @@ fun main() {
     val inputFiles = exampleInputs.map { it.first } + listOf(seriousInputFile)
 
     println("Creating Kotlin files...")
-    val kotlinFiles = createKotlinFiles(modulePath, year, day, exampleInputs.map { it.second to it.third })
+    val kotlinSrcFile = createKotlinSrcFile(modulePath, year, day)
+    val kotlinTestFile = createKotlinTestFile(modulePath, year, day, exampleInputs.map { it.second to it.third })
 
-    val createdFiles = kotlinFiles + inputFiles
+    val createdFiles = listOf(kotlinSrcFile, kotlinTestFile) + inputFiles
 
     println("Adding files to git...")
     addFilesToGit(createdFiles)
@@ -218,6 +224,38 @@ fun main() {
     createdFiles.forEach { println("\t$it") }
 
     println("Have fun!")
+}
+
+fun continueDay(year: String, day: String) {
+    println("The elf adventure continues, stay strong!")
+
+    val modulePath = createModulePath(year)
+
+    println("Fetching input data...")
+    val exampleInputs = fetchExampleInputs(modulePath, year, day)
+    val seriousInputFile = fetchSeriousInput(modulePath, year, day)
+    val inputFiles = exampleInputs.map { it.first } + listOf(seriousInputFile)
+
+    println("Creating Kotlin files...")
+    val kotlinTestFile = createKotlinTestFile(modulePath, year, day, exampleInputs.map { it.second to it.third })
+
+    val createdFiles = listOf(kotlinTestFile) + inputFiles
+
+    println("Adding files to git...")
+    addFilesToGit(createdFiles)
+
+    println("Created files:")
+    createdFiles.forEach { println("\t$it") }
+
+    println("Have fun!")
+}
+
+fun main() {
+    val (year, day, part2) = parseArgs()
+    when (part2) {
+        false -> initializeDay(year = year, day = day)
+        true -> continueDay(year = year, day = day)
+    }
 }
 
 main()
