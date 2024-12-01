@@ -45,13 +45,14 @@ class Day18(config: Config) : AocDay(config) {
                             !state.counting && direction != null -> state.copy(
                                 counting = true, startDirection = direction, counted = state.counted + 1,
                             )
-                            state.counting -> when (direction) {
-                                Direction.Up -> {
-                                    lines[]
-                                }
-                                null -> state.copy(counted = state.counted + 1)
-                                else -> error("unknown direction $direction")
-                            }
+                            // TODO fix ???
+                            // state.counting -> when (direction) {
+                            //     Direction.Up -> {
+                            //         lines[]
+                            //     }
+                            //     null -> state.copy(counted = state.counted + 1)
+                            //     else -> error("unknown direction $direction")
+                            // }
                             else -> state
                         }
                     }

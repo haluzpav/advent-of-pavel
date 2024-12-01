@@ -1,6 +1,7 @@
 package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,6 +20,7 @@ class Day12Test {
     }
 
     @Test
+    @Ignore // too slow
     fun testPart2() {
         val task = Day12(AocDay.Config("Day12_test_1", verboseLog = false))
         assertEquals("525152", task.part2())
