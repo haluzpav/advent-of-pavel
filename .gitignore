@@ -1,4 +1,8 @@
 .gradle
-.idea
 build
 .DS_Store
+.kotlin
+
+.idea/*
+!.idea/.name
+!.idea/runConfigurations
