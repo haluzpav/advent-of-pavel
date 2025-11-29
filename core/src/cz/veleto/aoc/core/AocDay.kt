@@ -2,17 +2,17 @@ package cz.veleto.aoc.core
 
 abstract class AocDay(protected val config: Config) {
 
-    data class Config(
-        val inputName: String,
-        val log: Boolean = true,
-        val verboseLog: Boolean = true,
-        // TODO make Config extendable somehow ??
-        val year2022day15part1row: Int = -1,
-        val year2022day15part2max: Int = -1,
-        val year2023day11part2expandFactor: Int = 2,
-    )
+    interface Config {
+        val yearName: String
+        val inputName: String?
+        val log: Boolean
+        val verboseLog: Boolean
+    }
 
-    protected val input: Sequence<String> = readInput(config.inputName)
+    protected val input: Sequence<String> = readInput(
+        yearName = config.yearName,
+        inputName = requireNotNull(config.inputName) { "inputName should be non-null before running a Day" },
+    )
 
     // prefer to use the Sequence above only
     protected val cachedInput: List<String> by lazy(LazyThreadSafetyMode.NONE) {
