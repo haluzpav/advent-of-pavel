@@ -3,4 +3,4 @@ product:
   platforms: [jvm, macosArm64, linuxX64]
 
 dependencies:
-  - com.squareup.okio:okio:3.6.0
+  - com.squareup.okio:okio:3.16.2
