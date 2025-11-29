@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.AocDay
 
-class Day19(config: Config) : AocDay(config) {
+class Day19(override val config: Year2022Config) : AocDay(config) {
 
     private val inputRegex = Regex(
         """

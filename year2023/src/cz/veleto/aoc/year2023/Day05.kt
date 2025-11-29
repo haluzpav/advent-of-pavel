@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.fullyIn
 import cz.veleto.aoc.core.intersect
 import cz.veleto.aoc.core.shift
 
-class Day05(config: Config) : AocDay(config) {
+class Day05(override val config: Year2023Config) : AocDay(config) {
 
     data class Problem(
         val rawSeeds: List<Long>, // for part 1

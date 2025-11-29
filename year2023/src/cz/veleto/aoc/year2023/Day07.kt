@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2023
 import cz.veleto.aoc.core.AocDay
 import kotlin.math.pow
 
-class Day07(config: Config) : AocDay(config) {
+class Day07(override val config: Year2023Config) : AocDay(config) {
 
     @Suppress("SpellCheckingInspection")
     private val cards = "23456789TJQKA"

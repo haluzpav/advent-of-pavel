@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 
-class Day12(config: Config) : AocDay(config) {
+class Day12(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String {
         val (nodes, start, end) = parseNodes()

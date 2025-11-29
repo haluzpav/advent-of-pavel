@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.plus
 
-class Day18(config: Config) : AocDay(config) {
+class Day18(override val config: Year2023Config) : AocDay(config) {
 
     override fun part1(): String {
         val startState = State()

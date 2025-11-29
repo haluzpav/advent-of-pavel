@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
 
-class Day02(config: Config) : AocDay(config) {
+class Day02(override val config: Year2023Config) : AocDay(config) {
 
     private val availableCubes = mapOf(
         Cube.Red to 12,

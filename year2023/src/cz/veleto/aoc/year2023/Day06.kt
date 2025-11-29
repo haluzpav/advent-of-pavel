@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.solveQuadratic
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class Day06(config: Config) : AocDay(config) {
+class Day06(override val config: Year2023Config) : AocDay(config) {
 
     override fun part1(): String = cachedInput
         .parsePart1()

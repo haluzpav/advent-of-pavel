@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.popFirstOrElse
 import cz.veleto.aoc.core.zipLongest
 import kotlin.math.pow
 
-class Day04(config: Config) : AocDay(config) {
+class Day04(override val config: Year2023Config) : AocDay(config) {
 
     override fun part1(): String = input
         .parseAndMatch()

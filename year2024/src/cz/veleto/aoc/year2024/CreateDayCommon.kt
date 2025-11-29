@@ -9,7 +9,7 @@ fun createDayCommon(day: Int): AocDay = when (day) {
     else -> error("undefined day $day")
 }
 
-private val mainConfig = Year2024Config(
+internal val mainConfig = Year2024Config(
     log = false,
     verboseLog = false,
 )

@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
 
-class Day01(config: Config) : AocDay(config) {
+class Day01(override val config: Year2023Config) : AocDay(config) {
 
     private val spelledOutDigits: Map<String, Int> = listOf(
         "one",

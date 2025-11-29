@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2024
 import cz.veleto.aoc.core.AocDay
 import kotlin.math.abs
 
-class Day01(config: Config) : AocDay(config) {
+class Day01(override val config: Year2024Config) : AocDay(config) {
 
     override fun part1(): String {
         val (aList, bList) = parseRawLists()

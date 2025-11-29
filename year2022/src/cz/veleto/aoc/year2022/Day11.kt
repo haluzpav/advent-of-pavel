@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.component6
 
-class Day11(config: Config) : AocDay(config) {
+class Day11(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String {
         val monkeys = parseMonkeys()

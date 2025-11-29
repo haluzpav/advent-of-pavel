@@ -7,7 +7,7 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.sign
 
-class Day09(config: Config) : AocDay(config) {
+class Day09(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String = countTailPositions(ropeLength = 2).toString()
 

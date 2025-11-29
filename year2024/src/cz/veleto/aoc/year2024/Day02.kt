@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-class Day02(config: Config) : AocDay(config) {
+class Day02(override val config: Year2024Config) : AocDay(config) {
 
     override fun part1(): String {
         return parseLevels().map { listOf(it) }.count { it.isSafeOrTolerable() }.toString()

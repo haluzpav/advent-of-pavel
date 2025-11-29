@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.allSame
 import cz.veleto.aoc.core.leastCommonMultiple
 
-class Day08(config: Config) : AocDay(config) {
+class Day08(override val config: Year2023Config) : AocDay(config) {
 
     private val nodeRegex = Regex("""^(\w{3}) = \((\w{3}), (\w{3})\)$""")
 

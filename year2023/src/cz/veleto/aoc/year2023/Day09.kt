@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2023
 
 import cz.veleto.aoc.core.AocDay
 
-class Day09(config: Config) : AocDay(config) {
+class Day09(override val config: Year2023Config) : AocDay(config) {
 
     override fun part1(): String = input
         .mapToEndStates()

@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos3
 import cz.veleto.aoc.core.manhattanTo
 
-class Day18(config: Config) : AocDay(config) {
+class Day18(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String {
         val cubes = parseCubes()

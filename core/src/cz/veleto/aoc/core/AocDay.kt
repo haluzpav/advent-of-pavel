@@ -1,6 +1,6 @@
 package cz.veleto.aoc.core
 
-abstract class AocDay(protected val config: Config) {
+abstract class AocDay(protected open val config: Config) {
 
     interface Config {
         val yearName: String
@@ -9,10 +9,12 @@ abstract class AocDay(protected val config: Config) {
         val verboseLog: Boolean
     }
 
-    protected val input: Sequence<String> = readInput(
-        yearName = config.yearName,
-        inputName = requireNotNull(config.inputName) { "inputName should be non-null before running a Day" },
-    )
+    protected val input: Sequence<String> by lazy(LazyThreadSafetyMode.NONE) {
+        readInput(
+            yearName = config.yearName,
+            inputName = requireNotNull(config.inputName) { "inputName should be non-null before running a Day" },
+        )
+    }
 
     // prefer to use the Sequence above only
     protected val cachedInput: List<String> by lazy(LazyThreadSafetyMode.NONE) {

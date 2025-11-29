@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.splitBy
 
-class Day01(config: Config) : AocDay(config) {
+class Day01(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String = input
         .toList()

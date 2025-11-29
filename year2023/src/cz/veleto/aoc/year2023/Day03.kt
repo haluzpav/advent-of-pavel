@@ -6,7 +6,7 @@ import cz.veleto.aoc.core.expand
 import cz.veleto.aoc.core.overlapsWith
 import cz.veleto.aoc.core.shift
 
-class Day03(config: Config) : AocDay(config) {
+class Day03(override val config: Year2023Config) : AocDay(config) {
 
     private val numberRegex = Regex("[0-9]+")
     private val symbolRegex = Regex("[^0-9.]")

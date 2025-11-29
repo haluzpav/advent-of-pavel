@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.plus
 
-class Day17(config: Config) : AocDay(config) {
+class Day17(override val config: Year2022Config) : AocDay(config) {
     private val baseRocks = listOf(
         Rock(
             shape = '-',

@@ -6,14 +6,14 @@ import cz.veleto.aoc.core.manhattanTo
 import cz.veleto.aoc.core.plus
 import cz.veleto.aoc.core.transpose
 
-class Day11(config: Config) : AocDay(config) {
+class Day11(override val config: Year2023Config) : AocDay(config) {
 
     private val spaceChar = '.'
     private val galaxyChar = '#'
 
     override fun part1(): String = solve(expandFactor = 2)
 
-    override fun part2(): String = solve(expandFactor = config.year2023day11part2expandFactor)
+    override fun part2(): String = solve(expandFactor = config.day11part2expandFactor)
 
     private fun solve(expandFactor: Int): String {
         val verticalExpansion = cachedInput.mapToVerticalExpansion(expandFactor)

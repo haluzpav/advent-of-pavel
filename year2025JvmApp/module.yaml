@@ -1,5 +1,5 @@
 product: jvm/app
 
 dependencies:
-  - ../../core
-  - ../
+  - ../core
+  - ../year2025

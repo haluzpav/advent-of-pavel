@@ -4,7 +4,7 @@ import cz.veleto.aoc.core.AocDay
 import kotlin.jvm.JvmInline
 import kotlin.math.min
 
-class Day13(config: Config) : AocDay(config) {
+class Day13(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String = input.chunked(3)
         .mapIndexed { pairIndex, (leftString, rightString) ->

@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2023
 import cz.veleto.aoc.core.AocDay
 import cz.veleto.aoc.core.permute
 
-class Day12(config: Config) : AocDay(config) {
+class Day12(override val config: Year2023Config) : AocDay(config) {
 
     override fun part1(): String = solve(folds = 1)
 

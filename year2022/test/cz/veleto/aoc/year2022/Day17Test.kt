@@ -1,11 +1,10 @@
 package cz.veleto.aoc.year2022
 
-import cz.veleto.aoc.core.AocDay
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class Day17Test {
-    private val task = Day17(AocDay.Config("Day17_test"))
+    private val task = Day17(Year2022Config("Day17_test"))
 
     @Test
     fun testPart1() {

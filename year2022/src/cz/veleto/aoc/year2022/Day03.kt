@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.AocDay
 
-class Day03(config: Config) : AocDay(config) {
+class Day03(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String = input.map { s ->
         check(s.length.rem(2) == 0)

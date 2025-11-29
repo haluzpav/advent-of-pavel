@@ -39,7 +39,7 @@ fun createKotlinSrcFileContent(year: String, day: String): String = """
 
     import cz.veleto.aoc.core.AocDay
 
-    class Day$day(config: Config) : AocDay(config) {
+    class Day$day(override val config: Year${year}Config) : AocDay(config) {
 
         override fun part1(): String {
             // TODO
@@ -54,15 +54,15 @@ fun createKotlinSrcFileContent(year: String, day: String): String = """
 
 """.trimIndent()
 
-fun createKotlinTestFunction(day: String, part: Int, exampleInputSuffix: String, answer: String) = """
+fun createKotlinTestFunction(year: String, day: String, part: Int, exampleInputSuffix: String, answer: String) = """
     @Test
     fun testPart$part$exampleInputSuffix() {
-        val task = Day$day(AocDay.Config("Day${day}_test$exampleInputSuffix"))
+        val task = Day$day(Year${year}Config("Day${day}_test$exampleInputSuffix"))
         assertEquals("$answer", task.part$part())
     }
 """.trimIndent()
 
-fun createKotlinTestFunctions(day: String, answers: List<Pair<String?, String?>>): String = buildString {
+fun createKotlinTestFunctions(year: String, day: String, answers: List<Pair<String?, String?>>): String = buildString {
     answers.forEachIndexed { inputIndex, inputAnswers ->
         inputAnswers.toList().forEachIndexed { partIndex, answer ->
             if (answer != null) {
@@ -70,6 +70,7 @@ fun createKotlinTestFunctions(day: String, answers: List<Pair<String?, String?>>
                 appendLine()
                 appendLine(
                     createKotlinTestFunction(
+                        year = year,
                         day = day,
                         part = partIndex + 1,
                         exampleInputSuffix = suffix,
@@ -91,7 +92,7 @@ fun createKotlinTestFileContent(year: String, day: String, answers: List<Pair<St
     class Day${day}Test {
     %s}
 
-""".trimIndent().format(createKotlinTestFunctions(day, answers))
+""".trimIndent().format(createKotlinTestFunctions(year, day, answers))
 
 fun Path.createFile(text: String): Path = apply {
     writeText(
@@ -192,7 +193,7 @@ fun addImplementationToBuilder(modulePath: Path, year: String, day: String) {
     val lines = path.readLines()
     val elseCaseIndex = lines.indexOfFirst { "else ->" in it }
     val newLines = lines.toMutableList().apply {
-        val newLine = """${day.toInt()} -> Day$day(baseSeriousConfig.copy(inputName = "Day$day"))"""
+        val newLine = """${day.toInt()} -> Day$day(mainConfig.copy(inputName = "Day$day"))"""
         add(elseCaseIndex, newLine.prependIndent())
     }
     path.writeLines(newLines)

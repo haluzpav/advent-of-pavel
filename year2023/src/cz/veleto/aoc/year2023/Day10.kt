@@ -9,7 +9,7 @@ import cz.veleto.aoc.core.move
 import cz.veleto.aoc.core.plus
 import cz.veleto.aoc.core.rotateClockwise
 
-class Day10(config: Config) : AocDay(config) {
+class Day10(override val config: Year2023Config) : AocDay(config) {
 
     data class State(
         val pipeEnds: Set<PipeEnd>,

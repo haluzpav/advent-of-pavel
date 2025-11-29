@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.Pos
 import kotlin.math.max
 import kotlin.math.min
 
-class Day14(config: Config) : AocDay(config) {
+class Day14(override val config: Year2022Config) : AocDay(config) {
 
     private val xShift = -300
     private val maxX = 700

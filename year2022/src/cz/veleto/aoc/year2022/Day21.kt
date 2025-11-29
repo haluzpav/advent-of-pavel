@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.AocDay
 
-class Day21(config: Config) : AocDay(config) {
+class Day21(override val config: Year2022Config) : AocDay(config) {
 
     companion object {
         private const val RootMonkey = "root"

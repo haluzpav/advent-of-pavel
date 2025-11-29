@@ -9,7 +9,7 @@ import cz.veleto.aoc.core.plus
 import cz.veleto.aoc.core.rotateBy
 import java.util.PriorityQueue
 
-class Day24(config: Config) : AocDay(config) {
+class Day24(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String = goThroughValley(SnacksState.Forgotten)
 

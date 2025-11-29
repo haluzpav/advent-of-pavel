@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.AocDay
 
-class Day16(config: Config) : AocDay(config) {
+class Day16(override val config: Year2022Config) : AocDay(config) {
 
     private val inputRegex = Regex("""^Valve ([A-Z]+) has flow rate=([0-9]+); tunnels? leads? to valves? (.+)$""")
 

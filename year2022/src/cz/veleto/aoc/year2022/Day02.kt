@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2022
 
 import cz.veleto.aoc.core.AocDay
 
-class Day02(config: Config) : AocDay(config) {
+class Day02(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String = input.sumOf { calcScore1(it[0], it[2]) }.toString()
 

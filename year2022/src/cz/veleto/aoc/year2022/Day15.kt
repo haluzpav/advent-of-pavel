@@ -5,13 +5,13 @@ import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.manhattanTo
 import kotlin.math.abs
 
-class Day15(config: Config) : AocDay(config) {
+class Day15(override val config: Year2022Config) : AocDay(config) {
 
     private val inputLineRegex = Regex("""^.*x=(-?[0-9]+), y=(-?[0-9]+).+x=(-?[0-9]+), y=(-?[0-9]+).*$""")
 
     override fun part1(): String = parseSensors()
         .map { sensor ->
-            val row = config.year2022day15part1row
+            val row = config.day15part1row
             val (x, y) = sensor.pos
             val (bx, by) = sensor.closestBeacon
             val dToRow = abs(row - y)
@@ -24,7 +24,7 @@ class Day15(config: Config) : AocDay(config) {
         .toString()
 
     override fun part2(): String {
-        val max = config.year2022day15part2max
+        val max = config.day15part2max
         val sensors = parseSensors().toList()
         return sensors
             .flatMap { sensor ->

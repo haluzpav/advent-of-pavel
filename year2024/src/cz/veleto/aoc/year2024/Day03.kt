@@ -2,7 +2,7 @@ package cz.veleto.aoc.year2024
 
 import cz.veleto.aoc.core.AocDay
 
-class Day03(config: Config) : AocDay(config) {
+class Day03(override val config: Year2024Config) : AocDay(config) {
 
     private val mulRegex = Regex("""mul\(([0-9]{1,3}),([0-9]{1,3})\)""")
     private val enablingRegex = Regex("""(?:^|do\(\))(.*?)(?:don't\(\)|$)""")

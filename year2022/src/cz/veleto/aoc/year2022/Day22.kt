@@ -7,7 +7,7 @@ import cz.veleto.aoc.core.rotateBy
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-class Day22(config: Config) : AocDay(config) {
+class Day22(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String {
         val (tiles, walls, instructions) = parseInput()

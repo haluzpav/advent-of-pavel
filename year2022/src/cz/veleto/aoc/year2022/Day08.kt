@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.get
 import cz.veleto.aoc.core.rotateBy
 
-class Day08(config: Config) : AocDay(config) {
+class Day08(override val config: Year2022Config) : AocDay(config) {
     private val treesInRow: Int = cachedInput.lastIndex
 
     override fun part1(): String {

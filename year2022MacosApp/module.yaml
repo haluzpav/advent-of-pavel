@@ -3,4 +3,5 @@ product:
   platforms: [macosArm64]
 
 dependencies:
-  - ..
+  - ../core
+  - ../year2022

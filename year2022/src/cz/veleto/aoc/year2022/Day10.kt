@@ -3,7 +3,7 @@ package cz.veleto.aoc.year2022
 import cz.veleto.aoc.core.AocDay
 import kotlin.math.abs
 
-class Day10(config: Config) : AocDay(config) {
+class Day10(override val config: Year2022Config) : AocDay(config) {
 
     private val xReg: Sequence<Int> = input
         .flatMap {

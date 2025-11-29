@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.get
 import cz.veleto.aoc.core.plus
 
-class Day16(config: Config) : AocDay(config) {
+class Day16(override val config: Year2023Config) : AocDay(config) {
 
     override fun part1(): String = countEnergizedTiles(startBeam = Pos(0, 0) to Direction.Right).toString()
 

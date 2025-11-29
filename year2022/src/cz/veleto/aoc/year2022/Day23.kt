@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.Pos
 import cz.veleto.aoc.core.plus
 import cz.veleto.aoc.core.rotateBy
 
-class Day23(config: Config) : AocDay(config) {
+class Day23(override val config: Year2022Config) : AocDay(config) {
 
     override fun part1(): String {
         var elves = parseElves()
