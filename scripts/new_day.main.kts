@@ -85,7 +85,6 @@ fun createKotlinTestFunctions(year: String, day: String, answers: List<Pair<Stri
 fun createKotlinTestFileContent(year: String, day: String, answers: List<Pair<String?, String?>>): String = """
     package cz.veleto.aoc.year$year
 
-    import cz.veleto.aoc.core.AocDay
     import kotlin.test.Test
     import kotlin.test.assertEquals
 

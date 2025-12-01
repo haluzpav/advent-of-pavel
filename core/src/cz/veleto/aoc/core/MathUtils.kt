@@ -7,6 +7,8 @@ import kotlin.math.sqrt
 
 fun Int.positiveRem(other: Int): Int = (rem(other) + other).rem(other)
 
+fun Boolean.toInt(): Int = if (this) 1 else 0
+
 fun solveQuadratic(a: Double, b: Double, c: Double): Pair<Double, Double> {
     val det = b.pow(2) - 4 * a * c
     val x1 = (-b - sqrt(det)) / 2 / a
