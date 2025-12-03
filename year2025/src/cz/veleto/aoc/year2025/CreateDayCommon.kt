@@ -10,6 +10,6 @@ fun createDayCommon(day: Int): AocDay = when (day) {
 }
 
 internal val mainConfig = Year2025Config(
-    log = false,
+    log = true,
     verboseLog = false,
 )
