@@ -1,6 +1,6 @@
 product:
   type: lib
-  platforms: [jvm, macosArm64, linuxX64]
+  platforms: [jvm, macosArm64]
 
 dependencies:
   - ../core
