@@ -47,7 +47,8 @@ class Day03(override val config: Year2025Config) : AocDay(config) {
             ?.let { return it }
 
         return sortedByValue
-            .map { chosen ->
+            .filter { length - it.index + indexShift >= batteryCount }
+            .maxOf { chosen ->
                 val newIndexShift = chosen.index + 1
                 val maxChild = substring(newIndexShift - indexShift).findMaxJolts(
                     sortedByValue = sortedByValue.filter { it.index >= newIndexShift },
@@ -57,7 +58,6 @@ class Day03(override val config: Year2025Config) : AocDay(config) {
                 )
                 chosen.value.toString() + maxChild
             }
-            .maxBy { it.toLong() }
             .also { cache[cacheKey] = it }
             .also {
                 if (config.verboseLog) println("${" ".repeat(indexShift)}$this -> found sub-max $it")
