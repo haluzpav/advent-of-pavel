@@ -33,32 +33,33 @@ class Day03(override val config: Year2025Config) : AocDay(config) {
     private fun String.findMaxJolts(
         sortedByValue: List<IndexedValue<Char>>,
         batteryCount: Int,
-        indexShift: Int = 0,
         cache: MutableMap<Any, String> = mutableMapOf(),
     ): String {
         if (isEmpty()) return ""
         if (batteryCount == 0) return ""
 
-        val cacheKey = batteryCount to indexShift
+        val cacheKey = length to batteryCount
         cache[cacheKey]
-            ?.also { if (config.verboseLog) println("${" ".repeat(indexShift)}$this -> found in cache $it") }
+            ?.also { if (config.verboseLog) println("\t\t$this -> found in cache $it") }
             ?.let { return it }
 
         return sortedByValue
-            .filter { length - it.index + indexShift >= batteryCount }
+            .filter { length - it.index >= batteryCount }
             .maxOf { chosen ->
-                val newIndexShift = chosen.index + 1
-                val maxChild = substring(newIndexShift - indexShift).findMaxJolts(
-                    sortedByValue = sortedByValue.filter { it.index >= newIndexShift },
+                val maxChild = substring(chosen.index + 1).findMaxJolts(
+                    sortedByValue = sortedByValue.mapNotNull {
+                        val newIndex = it.index - chosen.index - 1
+                        if (newIndex < 0) return@mapNotNull null
+                        it.copy(index = newIndex)
+                    },
                     batteryCount = batteryCount - 1,
-                    indexShift = newIndexShift,
                     cache = cache,
                 )
                 chosen.value.toString() + maxChild
             }
             .also { cache[cacheKey] = it }
             .also {
-                if (config.verboseLog) println("${" ".repeat(indexShift)}$this -> found sub-max $it")
+                if (config.verboseLog) println("\t\t$this -> found sub-max $it")
             }
     }
 }
