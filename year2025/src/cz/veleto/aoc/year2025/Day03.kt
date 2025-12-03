@@ -18,8 +18,6 @@ class Day03(override val config: Year2025Config) : AocDay(config) {
         check(isNotEmpty())
         check(batteryCount > 1)
 
-        if (config.log) println(this)
-
         val sortedByValue = this
             .map { it.digitToInt() }
             .withIndex()
