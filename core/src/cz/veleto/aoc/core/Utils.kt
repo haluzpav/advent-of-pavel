@@ -25,3 +25,7 @@ fun <T> permute(choiceA: T, choiceB: T, size: Int): Sequence<List<T>> {
                 .map { if (it) choiceA else choiceB }
         }
 }
+
+fun List<String>.print() {
+    forEach(::println)
+}

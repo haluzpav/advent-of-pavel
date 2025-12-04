@@ -7,6 +7,12 @@ typealias Pos3 = Triple<Int, Int, Int>
 
 operator fun List<String>.get(pos: Pos): Char = this[pos.first][pos.second]
 
+operator fun MutableList<String>.set(pos: Pos, value: Char) {
+    this[pos.first] = this[pos.first].let {
+        it.take(pos.second) + value + it.drop(pos.second + 1)
+    }
+}
+
 operator fun List<String>.contains(pos: Pos): Boolean = pos.first in indices && pos.second in this[pos.first].indices
 
 operator fun Pos.plus(other: Pos): Pos = first + other.first to second + other.second
