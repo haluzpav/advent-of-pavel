@@ -2,6 +2,6 @@ import cz.veleto.aoc.core.runSingleDay
 import cz.veleto.aoc.year2025.createDayCommon
 
 fun main() {
-    runSingleDay(3, ::createDayCommon)
+    runSingleDay(4, ::createDayCommon)
     // runAllDays(::createDayCommon)
 }

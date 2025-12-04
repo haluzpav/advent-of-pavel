@@ -7,6 +7,8 @@ typealias Pos3 = Triple<Int, Int, Int>
 
 operator fun List<String>.get(pos: Pos): Char = this[pos.first][pos.second]
 
+operator fun List<String>.contains(pos: Pos): Boolean = pos.first in indices && pos.second in this[pos.first].indices
+
 operator fun Pos.plus(other: Pos): Pos = first + other.first to second + other.second
 
 operator fun Pos.minus(other: Pos): Pos = first - other.first to second - other.second
