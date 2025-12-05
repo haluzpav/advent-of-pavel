@@ -32,14 +32,13 @@ class Day05(override val config: Year2025Config) : AocDay(config) {
         }
         .map { (a, b) -> a..b }
 
-    private fun Set<LongRange>.mergeIn(range: LongRange): Set<LongRange> {
-        val (untouchedRanges, newMergedRange) = this
-            .fold(this to range) { (untouched, merged), considered ->
-                val overlaps = merged.overlapsWith(considered)
-                val newUntouched = if (overlaps) untouched.minusElement(considered) else untouched
-                val newMerged = if (overlaps) merged.merge(considered) else merged
-                newUntouched to newMerged
+    private fun Set<LongRange>.mergeIn(range: LongRange): Set<LongRange> = this
+        .fold(emptySet<LongRange>() to range) { (untouched, merged), considered ->
+            if (merged.overlapsWith(considered)) {
+                untouched to merged.merge(considered)
+            } else {
+                untouched.plusElement(considered) to merged
             }
-        return untouchedRanges.plusElement(newMergedRange)
-    }
+        }
+        .let { (untouched, merged) -> untouched.plusElement(merged) }
 }
