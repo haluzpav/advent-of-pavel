@@ -26,3 +26,7 @@ fun IntRange.intersect(other: IntRange): IntRange =
 
 fun LongRange.intersect(other: LongRange): LongRange =
     max(first, other.first)..min(last, other.last)
+
+/** ⚠️ If the ranges don't overlap, the result will contain the elements in between. */
+fun LongRange.merge(other: LongRange): LongRange =
+    min(first, other.first)..max(last, other.last)
