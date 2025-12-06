@@ -8,6 +8,11 @@ fun <T, U> Iterable<T>.splitBy(predicate: (T) -> Boolean, mapElement: (T) -> U):
         acc
     }
 
+fun <T> Iterable<T>.splitBy(predicate: (T) -> Boolean): List<List<T>> = splitBy(
+    predicate = predicate,
+    mapElement = { it },
+)
+
 operator fun <E> List<E>.component6(): E = this[5]
 fun <T> List<T>.getWrapped(index: Int) = this[index.positiveRem(size)]
 fun <T> Iterable<T>.popFirstOrElse(defaultValue: () -> T): Pair<T, List<T>> =

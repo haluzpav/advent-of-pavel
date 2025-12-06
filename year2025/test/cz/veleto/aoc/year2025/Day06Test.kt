@@ -10,4 +10,10 @@ class Day06Test {
         val task = Day06(Year2025Config("Day06_test"))
         assertEquals("4277556", task.part1())
     }
+
+    @Test
+    fun testPart2() {
+        val task = Day06(Year2025Config("Day06_test"))
+        assertEquals("3263827", task.part2())
+    }
 }
