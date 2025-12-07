@@ -32,9 +32,9 @@ class Day07(override val config: Year2025Config) : AocDay(config) {
     override fun part2(): String = input
         .foldIndexed(State2()) { lineIndex, state, line ->
             if (state.beams.isEmpty()) {
-                return@foldIndexed state.copy(beams = listOf(line.indexOf('S')))
+                return@foldIndexed state.copy(beams = mapOf(line.indexOf('S') to 1))
             }
-            if (config.log) println("Line $lineIndex, beam count ${state.beams.size}")
+            if (config.log) println("Line $lineIndex, beam paths ${state.beams.size}, beam count ${state.beams.values.sum()}")
 
             val activatedSplitters = line
                 .withIndex()
@@ -44,16 +44,26 @@ class Day07(override val config: Year2025Config) : AocDay(config) {
 
             val passingBeams = state.beams - activatedSplitters.toSet()
             val splitBeams = activatedSplitters
-                .flatMap { splitter -> List(state.beams.count { it == splitter }) { splitter } }
-                .flatMap { listOf(it - 1, it + 1) }
+                .flatMap { splitter ->
+                    val count = state.beams[splitter]!!
+                    listOf(splitter - 1 to count, splitter + 1 to count)
+                }
+            val mergedBeams = splitBeams
+                .plus(passingBeams.toList())
+                .groupBy(
+                    keySelector = { it.first },
+                    valueTransform = { it.second },
+                )
+                .mapValues { it.value.sum() }
+                .toMap()
 
             state.copy(
-                beams = passingBeams + splitBeams,
-                splitCount = state.splitCount + activatedSplitters.size,
+                beams = mergedBeams,
             )
         }
         .beams
-        .size
+        .values
+        .sum()
         .toString()
 
     private data class State(
@@ -62,7 +72,7 @@ class Day07(override val config: Year2025Config) : AocDay(config) {
     )
 
     private data class State2(
-        val beams: List<Int> = emptyList(),
-        val splitCount: Int = 0,
+        // index, count
+        val beams: Map<Int, Long> = emptyMap(),
     )
 }
