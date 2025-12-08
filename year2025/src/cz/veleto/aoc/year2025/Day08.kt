@@ -25,31 +25,12 @@ class Day08(override val config: Year2025Config) : AocDay(config) {
         val circuits = sortedPairs
             .asSequence()
             .take(pairCount)
-            .fold(IntArray(boxes.size)) { circuits, pair ->
+            .fold(IntArray(boxes.size) { it }) { circuits, pair ->
                 val (i1, i2) = pair
                 val c1 = circuits[i1]
                 val c2 = circuits[i2]
                 when {
-                    c1 == 0 && c2 == 0 -> {
-                        val c = circuits.max() + 1
-                        if (config.verboseLog) println("\tcreating circuit $c at $i1 and $i2")
-                        circuits[i1] = c
-                        circuits[i2] = c
-                    }
-
-                    c1 == 0 -> {
-                        if (config.verboseLog) println("\tadding $i1 to circuit $c2")
-                        circuits[i1] = c2
-                    }
-
-                    c2 == 0 -> {
-                        if (config.verboseLog) println("\tadding $i2 to circuit $c1")
-                        circuits[i2] = c1
-                    }
-
-                    c1 == c2 -> {
-                        if (config.verboseLog) println("\tboth $i1 and $i2 are already in circuit $c1")
-                    }
+                    c1 == c2 -> if (config.verboseLog) println("\tboth $i1 and $i2 are already in circuit $c1")
 
                     else -> {
                         // merge
@@ -66,12 +47,11 @@ class Day08(override val config: Year2025Config) : AocDay(config) {
                 circuits
             }
         val biggestCircuits = circuits
-            .filter { it > 0 }
             .groupBy { it }
             .values
             .map { it.size }
             .sortedDescending()
-        if (config.verboseLog) println("${biggestCircuits.size} circuits: $biggestCircuits")
+        if (config.log) println("${biggestCircuits.size} circuits: $biggestCircuits")
         return biggestCircuits
             .take(3)
             .reduce(Int::times)
