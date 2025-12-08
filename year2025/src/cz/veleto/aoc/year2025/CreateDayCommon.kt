@@ -10,10 +10,12 @@ fun createDayCommon(day: Int): AocDay = when (day) {
     5 -> Day05(mainConfig.copy(inputName = "Day05"))
     6 -> Day06(mainConfig.copy(inputName = "Day06"))
     7 -> Day07(mainConfig.copy(inputName = "Day07"))
+    8 -> Day08(mainConfig.copy(inputName = "Day08"))
     else -> error("undefined day $day")
 }
 
 internal val mainConfig = Year2025Config(
     log = true,
     verboseLog = false,
+    day08Part1PairCount = 1000,
 )
