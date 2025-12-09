@@ -36,7 +36,18 @@ class Day09(override val config: Year2025Config) : AocDay(config) {
     }
 
     override fun part2(): String {
-        // TODO
+        /*
+        TODO
+         - parse points, count turns
+         - by turns, decide "inside" direction at start
+         - go over points/corners again, for each:
+             - find valid quadrants by direction
+             - go over points in each quadrant
+                 - remember rect size of each
+                 - new points can invalidate old, when they are inside
+             - update direction
+         - get valid max of sub-loops above
+         */
         return ""
     }
 }
