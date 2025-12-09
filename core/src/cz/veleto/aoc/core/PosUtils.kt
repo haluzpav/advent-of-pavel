@@ -7,6 +7,11 @@ import kotlin.math.sqrt
 typealias Pos = Pair<Int, Int>
 typealias Pos3 = Triple<Int, Int, Int>
 
+fun List<Int>.toPos(): Pos {
+    check(size >= 2)
+    return Pos(component1(), component2())
+}
+
 fun List<Int>.toPos3(): Pos3 {
     check(size >= 3)
     return Pos3(component1(), component2(), component3())
@@ -54,3 +59,19 @@ fun Pos.rotateClockwise(): Pos = second to -first
 fun Pos.flip(): Pos = -first to -second
 
 fun Iterable<Pos>.move(pos: Pos): List<Pos> = map { it + pos }
+
+fun Pos.abs(): Pos = abs(first) to abs(second)
+
+fun Pos.toIterable(): Iterable<Int> = Iterable {
+    object : Iterator<Int> {
+        private var index = 0
+
+        override fun next(): Int = when (index++) {
+            0 -> component1()
+            1 -> component2()
+            else -> error("Invalid index $index")
+        }
+
+        override fun hasNext(): Boolean = index < 2
+    }
+}
