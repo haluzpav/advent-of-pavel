@@ -1,6 +1,9 @@
 package cz.veleto.aoc.year2025
 
 import cz.veleto.aoc.core.AocDay
+import cz.veleto.aoc.core.findPathByAStar
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class Day10(override val config: Year2025Config) : AocDay(config) {
 
@@ -18,10 +21,10 @@ class Day10(override val config: Year2025Config) : AocDay(config) {
         .parseMachines()
         .mapIndexed { index, machine ->
             if (config.log) println("Machine $index: $machine")
-            getMinTransitionCountToMatchJoltage(
+            getMinTransitionCountToMatchJoltage2(
                 targetJoltages = machine.targetJoltages,
                 buttonTransitions = machine.buttonTransitions,
-            )!!.also {
+            ).also {
                 if (config.log) println("\tmin transitions to match joltage = $it")
             }
         }
@@ -81,55 +84,27 @@ class Day10(override val config: Year2025Config) : AocDay(config) {
     private fun Set<Int>.asLightsWithAppliedButton(transitions: Set<Int>): Set<Int> =
         (this - transitions) + (transitions - this)
 
-    private fun getMinTransitionCountToMatchJoltage(
+    private fun getMinTransitionCountToMatchJoltage2(
         targetJoltages: List<Int>,
         buttonTransitions: List<Set<Int>>,
-        currentJoltages: List<Int> = List(targetJoltages.size) { 0 },
-        usedTransitions: Int = 0,
-        lastTransitionIndex: Int? = null,
-        cache: MutableMap<List<Int>, Int> = mutableMapOf(),
-    ): Int? {
-        if (config.verboseLog) {
-            println("\t${" ".repeat(usedTransitions)}with button $lastTransitionIndex, joltages $currentJoltages")
-        }
-        return when {
-            cache.isNonGreaterInCacheOrElsePut(currentJoltages, usedTransitions) -> null.also {
-                if (config.verboseLog) println("\t\t${" ".repeat(usedTransitions)}cache hit")
-            }
-
-            currentJoltages == targetJoltages -> usedTransitions.also {
-                if (config.verboseLog) println("\t\t${" ".repeat(usedTransitions)}reached target")
-            }
-
-            currentJoltages
-                .zip(targetJoltages)
-                .any { (currentJoltage, targetJoltage) -> currentJoltage > targetJoltage } -> null.also {
-                if (config.verboseLog) println("\t\t${" ".repeat(usedTransitions)}over the limits")
-            }
-
-            else -> buttonTransitions
-                .mapIndexedNotNull { index, transitions ->
-                    getMinTransitionCountToMatchJoltage(
-                        targetJoltages = targetJoltages,
-                        buttonTransitions = buttonTransitions,
-                        currentJoltages = currentJoltages.asJoltagesWithAppliedButton(transitions),
-                        usedTransitions = usedTransitions + 1,
-                        lastTransitionIndex = index,
-                        cache = cache,
-                    )
-                }
-                .minOrNull()
-        }
-    }
-
-    private fun MutableMap<List<Int>, Int>.isNonGreaterInCacheOrElsePut(joltages: List<Int>, depth: Int): Boolean {
-        val c = this[joltages]
-        return if (c != null && c <= depth) {
-            true
-        } else {
-            this[joltages] = depth
-            false
-        }
+    ): Int {
+        val (_, minTransitionCount) = findPathByAStar(
+            start = List(targetJoltages.size) { 0 },
+            goal = targetJoltages,
+            h = { joltages ->
+                targetJoltages
+                    .zip(joltages, Int::minus)
+                    .map { it.toDouble().pow(2) }
+                    .reduce(Double::plus)
+            },
+            neighbors = { joltages ->
+                buttonTransitions
+                    .asSequence()
+                    .map { joltages.asJoltagesWithAppliedButton(it) to 1.0 }
+            },
+            logStep = if (config.verboseLog) 1000 else null,
+        )
+        return minTransitionCount.roundToInt()
     }
 
     private fun List<Int>.asJoltagesWithAppliedButton(transitions: Set<Int>): List<Int> = this
