@@ -5,7 +5,7 @@ import cz.veleto.aoc.core.AocDay
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-class Day10(override val config: Year2025Config) : AocDay(config) {
+class Day10Jvm(override val config: Year2025Config) : AocDay(config) {
 
     override fun part1(): String = input
         .parseMachines()

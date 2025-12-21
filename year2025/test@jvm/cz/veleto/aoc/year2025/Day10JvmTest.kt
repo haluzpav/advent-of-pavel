@@ -1,0 +1,19 @@
+package cz.veleto.aoc.year2025
+
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class Day10JvmTest {
+
+    @Test
+    fun testPart1() {
+        val task = Day10Jvm(Year2025Config("Day10_test"))
+        assertEquals("7", task.part1())
+    }
+
+    @Test
+    fun testPart2() {
+        val task = Day10Jvm(Year2025Config("Day10_test"))
+        assertEquals("33", task.part2())
+    }
+}
