@@ -3,6 +3,7 @@ package cz.veleto.aoc.core
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
+import kotlin.math.round
 import kotlin.math.sqrt
 
 fun Int.positiveRem(other: Int): Int = (rem(other) + other).rem(other)
@@ -28,3 +29,8 @@ fun leastCommonMultiple(a: Long, b: Long): Long {
 
 fun leastCommonMultiple(numbers: List<Long>): Long =
     numbers.reduce { acc, number -> leastCommonMultiple(acc, number) }
+
+fun Double.round(decimalPoints: Int = 0): Double {
+    val tens = 10.0.pow(decimalPoints)
+    return this.times(tens).let(::round).div(tens)
+}

@@ -1,9 +1,9 @@
 package cz.veleto.aoc.year2025
 
+import cz.veleto.aoc.core.AStar
 import cz.veleto.aoc.core.AocDay
-import cz.veleto.aoc.core.findPathByAStar
-import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 class Day10(override val config: Year2025Config) : AocDay(config) {
 
@@ -21,7 +21,7 @@ class Day10(override val config: Year2025Config) : AocDay(config) {
         .parseMachines()
         .mapIndexed { index, machine ->
             if (config.log) println("Machine $index: $machine")
-            getMinTransitionCountToMatchJoltage2(
+            getMinTransitionCountToMatchJoltage(
                 targetJoltages = machine.targetJoltages,
                 buttonTransitions = machine.buttonTransitions,
             ).also {
@@ -84,25 +84,48 @@ class Day10(override val config: Year2025Config) : AocDay(config) {
     private fun Set<Int>.asLightsWithAppliedButton(transitions: Set<Int>): Set<Int> =
         (this - transitions) + (transitions - this)
 
-    private fun getMinTransitionCountToMatchJoltage2(
+    private fun getMinTransitionCountToMatchJoltage(
         targetJoltages: List<Int>,
         buttonTransitions: List<Set<Int>>,
     ): Int {
-        val (_, minTransitionCount) = findPathByAStar(
-            start = List(targetJoltages.size) { 0 },
+        val dimensionCount = targetJoltages.size
+        val (_, minTransitionCount) = AStar.findPath(
+            start = List(dimensionCount) { 0 },
             goal = targetJoltages,
             h = { joltages ->
+                // euclid
+                // targetJoltages
+                //     .zip(joltages, Int::minus)
+                //     .map { it.toDouble().pow(2) }
+                //     .reduce(Double::plus)
+                //     .plus(Random.nextDouble())
+                //     .let(::sqrt)
+                //     .div(dimensionCount)
+
+                // manhattan
+                // targetJoltages
+                //     .zip(joltages, Int::minus)
+                //     .map(::abs)
+                //     .reduce(Int::plus)
+                //     .plus(Random.nextDouble())
+                //     .div(dimensionCount)
+
+                // max in any dimension
                 targetJoltages
                     .zip(joltages, Int::minus)
-                    .map { it.toDouble().pow(2) }
-                    .reduce(Double::plus)
+                    .max()
+                    .plus(Random.nextDouble())
             },
             neighbors = { joltages ->
                 buttonTransitions
                     .asSequence()
-                    .map { joltages.asJoltagesWithAppliedButton(it) to 1.0 }
+                    .map { joltages.asJoltagesWithAppliedButton(it) }
+                    .filter { neighbor ->
+                        targetJoltages.zip(neighbor, Int::minus).all { it >= 0 }
+                    }
+                    .map { it to 1.0 }
             },
-            logStep = if (config.verboseLog) 1000 else null,
+            logStep = if (config.verboseLog) 100_000 else null,
         )
         return minTransitionCount.roundToInt()
     }
